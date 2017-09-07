@@ -64,12 +64,9 @@ app.get('/',function(req,res){
 
 app.get("/protected", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME), function(req, res) {
   var accessToken = req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT].accessToken;
-  var toggledItem = req.query.foodItem;
-  var isGuest = req.user.amr[0] === "appid_anon";
 
   bluemix_appid.UserAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
-    var firstLogin = !isGuest && !attributes.points;
-    res.send('<p>' + req.user.name + '</p>' + '<img src="' + req.user.picture + '"/>');
+    res.send('<p>' + req.user.name + '</p>' + '<p>' + req.user.email + '</p>' + '<img src="' + req.user.picture + '"/>');
   });
 });
 
