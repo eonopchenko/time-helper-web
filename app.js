@@ -7,6 +7,10 @@ const helmet = require("helmet");
 const express_enforces_ssl = require("express-enforces-ssl");
 const cfEnv = require("cfenv");
 
+const GUEST_USER_HINT = "A guest user started using the app. App ID created a new anonymous profile, where the user’s selections can be stored.";
+const RETURNING_USER_HINT = "An identified user returned to the app with the same identity. The app accesses his identified profile and the previous selections that he made.";
+const NEW_USER_HINT = "An identified user logged in for the first time. Now when he logs in with the same credentials from any device or web client, the app will show his same profile and selections.";
+
 const LOGIN_URL = "/ibm/bluemix/appid/login";
 const CALLBACK_URL = "/ibm/bluemix/appid/callback";
 
@@ -59,7 +63,14 @@ app.get('/',function(req,res){
 });
 
 app.get("/protected", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME), function(req, res) {
-  res.send('<p>test</p>');
+  var accessToken = req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT].accessToken;
+  var toggledItem = req.query.foodItem;
+  var isGuest = req.user.amr[0] === "appid_anon";
+
+  bluemix_appid.UserAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
+    var firstLogin = !isGuest && !attributes.points;
+    res.send('<p>' + req.user.name + '</p>' + '<img src="' + req.user.picture + '"/>');
+  });
 });
 
 app.get("/anon_login", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME, {allowAnonymousLogin: true, successRedirect : '/protected', forceLogin: true}));
