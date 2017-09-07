@@ -1,14 +1,19 @@
 {
-  "name": "timehelperweb",
+  "name": "timehelperauthenticationappidweb",
   "version": "1.0.0",
-  "description": "Time Helper Web App",
+  "description": "App ID web application sample",
   "main": "app.js",
   "private": true,
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "cfenv": "^1.0.x",
-    "express": "^4.15.4"
+    "cfenv": "^1.0.3",
+    "bluemix-appid": "^1.0.0",
+    "express": "^4.13.4",
+    "express-enforces-ssl": "^1.1.0",
+    "express-session": "^1.15.1",
+    "helmet": "^3.6.0",
+    "passport": "^0.3.2"
   }
 }

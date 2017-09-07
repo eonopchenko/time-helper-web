@@ -6,3 +6,5 @@ applications:
   memory: 256M
   disk_quota: 1024M
   timeout: 180
+  services:
+  - time-helper-authentication
