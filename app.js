@@ -35,6 +35,8 @@ app.use(session({
 	}
 }));
 
+app.set('view engine', 'ejs');
+
 app.use(express.static("views"));
 
 app.use(passport.initialize());
@@ -66,15 +68,16 @@ app.get("/protected", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEG
   var accessToken = req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT].accessToken;
 
   bluemix_appid.UserAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
-    res.send('<p>' + req.user.name + '</p>' + '<p>' + req.user.email + '</p>' + '<img src="' + req.user.picture + '"/>');
+    res.render('landing', {
+        name: req.user.name, 
+        email: req.user.email,
+        picture: req.user.picture
+    });
+    // res.send('<p>' + req.user.name + '</p>' + '<p>' + req.user.email + '</p>' + '<img src="' + req.user.picture + '"/>');
   });
 });
 
-app.get("/anon_login", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME, {allowAnonymousLogin: true, successRedirect : '/protected', forceLogin: true}));
 app.get("/login", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME, {successRedirect : '/protected', forceLogin: true}));
-app.get("/token", function(req, res) {
-	res.render('token',{tokens: JSON.stringify(req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT])});
-});
 
 var port = process.env.PORT || 3000;
 app.listen(port, function(){
