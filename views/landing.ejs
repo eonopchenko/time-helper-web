@@ -2,16 +2,51 @@
 <html>
 <head>
     <title>Landing Page</title>
+    <link href="stylesheets/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="stylesheets/landing.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="main-container">
-        <div class="top-container">
-            <div class="flex-top">
-                <h2>Hello, <%= name %> (<%= email %>)!</h2>
-                <img class="user-profile" src="<%= picture %>" alt="picture" />
+    <div class="navbar navbar-inverse navbar-fixed-top navigation_bar" style="background-color:#152935;">
+        <div class="content" align="center" style="background-color:#25313D;">
+            <h3 style="color: #FFFFFA;">Hi, <%= name %> (<%= email %>)!</h3>
+            <h4 style="color: #FFFFFA;">Welcome to Time Helper!</h4>
+            <img style="color: #FFFFFA;" class="user-profile" src="<%= picture %>" alt="picture" />
+        </div>
+        <div class="container collapse navbar-collapse navHeaderCollapse" style="width: 800px !important">
+            <div class="row">
+                <div class="col-sm-3 operations_options">
+                    <button class="btn btn-primary btn-block" type="button" onclick="create_on_click_handler()">CREATE</button>
+                </div>
+                <div class="col-sm-3 operations_options">
+                    <button class="btn btn-primary btn-block" type="button" onclick="read_on_click_handler()">READ</button>
+                </div>
+                <div class="col-sm-3 operations_options">
+                    <button class="btn btn-primary btn-block" type="button" onclick="update_on_click_handler()">UPDATE</button>
+                </div>
+                <div class="col-sm-3 operations_options">
+                    <button class="btn btn-primary btn-block" type="button" onclick="delete_on_click_handler()">DELETE</button>
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        function create_on_click_handler() {
+            console.log('create button clicked!');
+        }
+
+        function read_on_click_handler() {
+            console.log('read button clicked!');
+        }
+
+        function update_on_click_handler() {
+            console.log('update button clicked!');
+        }
+
+        function delete_on_click_handler() {
+            console.log('delete button clicked!');
+        }
+    </script>
 </body>
 </html>
