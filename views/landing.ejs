@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="stylesheets/landing.css">
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/classes_actions.js"></script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top navigation_bar" style="background-color:#152935;">
@@ -20,7 +21,12 @@
                     <button class="btn btn-primary btn-block" type="button" onclick="create_on_click_handler()">CREATE</button>
                 </div>
                 <div class="col-sm-3 operations_options">
-                    <button class="btn btn-primary btn-block" type="button" onclick="read_on_click_handler()">READ</button>
+                    <form class="form-horizontal" action="/read_classes" method="GET" name="outcome" id="outcome">
+                        <fieldset>
+                            <input type="hidden" class="form-control" id="allclasses" value="allclasses" name="allclasses"/>
+                            <button id="read_classes" class="btn btn-primary btn-block" type="submit">READ</button>
+                        </fieldset>
+                    </form>
                 </div>
                 <div class="col-sm-3 operations_options">
                     <button class="btn btn-primary btn-block" type="button" onclick="update_on_click_handler()">UPDATE</button>
@@ -28,6 +34,8 @@
                 <div class="col-sm-3 operations_options">
                     <button class="btn btn-primary btn-block" type="button" onclick="delete_on_click_handler()">DELETE</button>
                 </div>
+            </div>
+            <div id="show_all_classes" style="display:none">
             </div>
         </div>
     </div>

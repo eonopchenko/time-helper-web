@@ -8,12 +8,14 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "cfenv": "^1.0.3",
     "bluemix-appid": "^1.0.0",
+    "bluemix-push-notifications": "*",
+    "cfenv": "^1.0.3",
+    "cloudant": "*",
     "ejs": "^2.5.6",
-    "express": "^4.13.4",
+    "express": "^4.15.4",
     "express-enforces-ssl": "^1.1.0",
-    "express-session": "^1.15.1",
+    "express-session": "^1.15.5",
     "helmet": "^3.6.0",
     "passport": "^0.3.2"
   }
