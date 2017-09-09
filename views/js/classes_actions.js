@@ -19,11 +19,15 @@ $(document).ready(function(){
 				var classes_table = "<table style=\"color: #FFFFFA;\">";
 				classes_table += "<tr>";
 				classes_table += "<th>Weekday</th>";
+				classes_table += "<th>Start time</th>";
+				classes_table += "<th>End time</th>";
 				classes_table += "<th>Title</th>";
 				classes_table += "</tr>";
 				for(var i = 0; i < data.length; i++) {
 					classes_table += "<tr>";
 					classes_table += "<td>" + data[i].day + "</td>";
+					classes_table += "<td>" + data[i].start_time + "</td>";
+					classes_table += "<td>" + data[i].end_time + "</td>";
 					classes_table += "<td>" + data[i].title + "</td>";
 					classes_table += "</tr>";
 				}

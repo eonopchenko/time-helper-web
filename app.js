@@ -91,15 +91,23 @@ app.get('/read_classes',function(req, res) {
       var user_data = body.rows;
       var list_of_classes = '[';
       var days_array = [];
+      var start_time_array = [];
+      var end_time_array = [];
       var titles_array = [];
 
       for(var i = 0; i < user_data.length; i++) {
         days_array.push(user_data[i].value[1]);
-        titles_array.push(user_data[i].value[2]);
+        start_time_array.push(user_data[i].value[2]);
+        end_time_array.push(user_data[i].value[3]);
+        titles_array.push(user_data[i].value[4]);
       }
 
       for(var i = 0; i < titles_array.length; i++) {
-        var json_block = '{\"day\":\"' + days_array[i] + '\",' + '\"title\":\"' + titles_array[i] + '\"}';
+        var json_block = 
+          '{\"day\":\"' + days_array[i] + '\",' + 
+          '\"start_time\":\"' + start_time_array[i] + '\",' + 
+          '\"end_time\":\"' + end_time_array[i] + '\",' + 
+          '\"title\":\"' + titles_array[i] + '\"}';
         if(i !== 0) {
           list_of_classes = list_of_classes.concat(",");
         }
