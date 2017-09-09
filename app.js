@@ -80,6 +80,7 @@ app.get("/login", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NA
 ///--- CLOUDANT DATABASE CONNECTION ---///
 var cloudant_url = 'https://dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix:397e251ab62bc131be9b552263a174e7d6701f4c261f8f0ed55853e4867e6b00@dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix.cloudant.com';
 var cloudant_instance = сloudant({url: cloudant_url});
+db = cloudant_instance.db.use('timetable_db');
 
 app.get('/read_classes',function(req, res) {
   var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
@@ -123,6 +124,34 @@ app.get('/read_classes',function(req, res) {
 			res.send(JSON.parse(str));
 		}
 	});
+});
+
+app.get('/create_class',function(req, res) {
+  var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
+  var name_string;
+  
+  request({
+    url: url,
+    json: true
+  }, function (error, response, body) {
+    if (!error && response.statusCode === 200) {
+      db.insert(req.query, function(err, data) {
+        if (!err) {
+          name_string="{\"added\":\"Yes\"}";
+        }
+        else {
+          name_string="{\"added\":\"DB insert error\"}";
+        }
+        res.contentType('application/json');
+        res.send(JSON.parse(name_string));
+      });
+    }
+    else {
+      name_string="{\"added\":\"DB read error\"}";
+      res.contentType('application/json');
+      res.send(JSON.parse(name_string));
+    }
+  });
 });
 
 var port = process.env.PORT || 3000;

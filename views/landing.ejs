@@ -35,17 +35,40 @@
                     <button class="btn btn-primary btn-block" type="button" onclick="delete_on_click_handler()">DELETE</button>
                 </div>
             </div>
-            <div id="show_all_classes" style="display:none">
-            </div>
         </div>
     </div>
+
+    <div class="container form_details">
+        <div id="create_class_form" style="display:none">
+            <form class="form-horizontal" action="/create_class" method="GET" name="outcome" id="outcome">
+                <fieldset>
+                    <legend class="resizables"> New Record Information </legend>
+                    <div class="form-group">
+                        <label for="newday" class="col-lg-2 control-label">Enter class to be added:</label>
+                        <div class="col-lg-10">
+                            <input type="text" autocomplete="off" class="form-control" id="newday" placeholder="Enter Day"/>
+                            <input type="text" autocomplete="off" class="form-control" id="newstart" placeholder="Enter Start Time"/>
+                            <input type="text" autocomplete="off" class="form-control" id="newend" placeholder="Enter End Time"/>
+                            <input type="text" autocomplete="off" class="form-control" id="newclass" placeholder="Enter Class"/>
+                        </div>
+                    </div>  
+                    <div class="form-group">
+                        <div class="col-lg-10 col-lg-offset-2">
+                            <button id="create_class_button" type="submit" class="btn btn-danger">Create Class</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div id="show_all_classes" style="display:none">
+        </div>
+    </div>
+
     <script>
         function create_on_click_handler() {
             console.log('create button clicked!');
-        }
-
-        function read_on_click_handler() {
-            console.log('read button clicked!');
+            document.getElementById("create_class_form").style.display="block";
+            document.getElementById("show_all_classes").style.display="none";
         }
 
         function update_on_click_handler() {

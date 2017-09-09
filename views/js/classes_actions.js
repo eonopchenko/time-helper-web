@@ -1,5 +1,4 @@
-$(document).ready(function(){
-	console.log("Before $.ajax");
+$(document).ready(function() {
     $("#read_classes").click(function(e) {
 		e.preventDefault();
 		$.ajax({
@@ -15,8 +14,9 @@ $(document).ready(function(){
 			},
 			success: function(data) {
 				console.log('process success');
+				document.getElementById("create_class_form").style.display="none";
 				document.getElementById("show_all_classes").style.display="block";
-				var classes_table = "<table style=\"color: #FFFFFA;\">";
+				var classes_table = "<table>";
 				classes_table += "<tr>";
 				classes_table += "<th>Weekday</th>";
 				classes_table += "<th>Start time</th>";
@@ -38,5 +38,32 @@ $(document).ready(function(){
                 console.log('process error');
             },
         });
-    });
+	});
+
+	$("#create_class_button").click(function(e) {
+		e.preventDefault();
+		$.ajax({
+			url: "/create_class",
+			type: "GET",
+			dataType: "json",
+			data: {
+				day: $("#newday").val(), 
+				start_time: $("#newstart").val(), 
+				end_time: $("#newend").val(), 
+				title: $("#newclass").val()
+			},
+			contentType: "application/json",
+			cache: true,
+			timeout: 5000,
+			complete: function() {
+			  console.log('process complete');
+			},
+			success: function(data) {
+				console.log('process success');
+			},
+			error: function() {
+				console.log('process error');
+			},
+		});
+	});
 });
