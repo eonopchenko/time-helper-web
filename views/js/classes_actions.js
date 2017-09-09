@@ -50,7 +50,7 @@ $(document).ready(function() {
 				day: $("#newday").val(), 
 				start_time: $("#newstart").val(), 
 				end_time: $("#newend").val(), 
-				title: $("#newclass").val()
+				title: $("#newtitle").val()
 			},
 			contentType: "application/json",
 			cache: true,
