@@ -8,6 +8,9 @@ const helmet = require("helmet");
 const express_enforces_ssl = require("express-enforces-ssl");
 const cfenv = require("cfenv");
 const сloudant = require('cloudant');
+const bluemix_push_notifications = require('bluemix-push-notifications');
+const PushNotifications = bluemix_push_notifications.PushNotifications;
+const Notification = bluemix_push_notifications.Notification;
 
 const LOGIN_URL = "/ibm/bluemix/appid/login";
 const CALLBACK_URL = "/ibm/bluemix/appid/callback";
@@ -138,6 +141,15 @@ app.get('/create_class',function(req, res) {
       db.insert(req.query, function(err, data) {
         if (!err) {
           name_string="{\"added\":\"Yes\"}";
+
+          var pushNotification = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
+          var notification = new Notification("New class has been scheduled: " + 
+            req.query.day + ", " + 
+            req.query.start_time + ", " + 
+            req.query.end_time + ", " + 
+            req.query.title);
+          pushNotification.send(notification, function(error, response, body) {
+          });
         }
         else {
           name_string="{\"added\":\"DB insert error\"}";
