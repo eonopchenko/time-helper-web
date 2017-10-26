@@ -116,10 +116,6 @@
                                 <option>ISCG7435 - Special Topic 1</option>
                                 <option>ISCG7436 - Special Topic 2</option>
                             </select>
-                            <!-- <input type="text" autocomplete="off" class="form-control" id="newday" placeholder="Enter Day"/>
-                            <input type="text" autocomplete="off" class="form-control" id="newstart" placeholder="Enter Start Time"/>
-                            <input type="text" autocomplete="off" class="form-control" id="newend" placeholder="Enter End Time"/>
-                            <input type="text" autocomplete="off" class="form-control" id="newclass" placeholder="Enter Class"/> -->
                         </div>
                     </div>  
                     <div class="form-group">
@@ -130,6 +126,11 @@
                 </fieldset>
             </form>
         </div>
+        <div id="created_class" style="display:none">
+            <div class="alert alert-success">
+                Class has been added to the database.
+            </div>
+        </div>
         <div id="show_all_classes" style="display:none">
         </div>
     </div>
@@ -139,14 +140,21 @@
             console.log('create button clicked!');
             document.getElementById("create_class_form").style.display="block";
             document.getElementById("show_all_classes").style.display="none";
+            document.getElementById("created_class").style.display="none";
         }
 
         function update_on_click_handler() {
             console.log('update button clicked!');
+            document.getElementById("create_class_form").style.display="none";
+            document.getElementById("show_all_classes").style.display="none";
+            document.getElementById("created_class").style.display="none";
         }
 
         function delete_on_click_handler() {
             console.log('delete button clicked!');
+            document.getElementById("create_class_form").style.display="none";
+            document.getElementById("show_all_classes").style.display="none";
+            document.getElementById("created_class").style.display="none";
         }
     </script>
 </body>

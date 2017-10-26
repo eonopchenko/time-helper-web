@@ -60,6 +60,11 @@ $(document).ready(function() {
 			},
 			success: function(data) {
 				console.log('process success');
+				if(data.added === "Yes") {
+					document.getElementById("create_class_form").style.display="none";
+					document.getElementById("show_all_classes").style.display="none";
+					document.getElementById("created_class").style.display="block";
+				}
 			},
 			error: function() {
 				console.log('process error');
