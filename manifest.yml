@@ -7,5 +7,5 @@ applications:
   disk_quota: 1024M
   timeout: 180
   services:
-  - time-helper-authentication
+  - time-helper-auth
   - time-helper-cloudant-db
