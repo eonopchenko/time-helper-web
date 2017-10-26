@@ -208,7 +208,8 @@ $(document).ready(function() {
 	 			if(data.updated === "updated") {
 					document.getElementById("update_class_form").style.display="none";
 	 				document.getElementById("updated_class").style.display="block";
-	 			}
+				 }
+				 location.reload(true)
 	 		}
 	 	});
 	 });
