@@ -11,6 +11,7 @@ const сloudant = require('cloudant');
 const bluemix_push_notifications = require('bluemix-push-notifications');
 const PushNotifications = bluemix_push_notifications.PushNotifications;
 const Notification = bluemix_push_notifications.Notification;
+var PushMessageBuilder = bluemix_push_notifications.PushMessageBuilder;
 
 const LOGIN_URL = "/ibm/bluemix/appid/login";
 const CALLBACK_URL = "/ibm/bluemix/appid/callback";
@@ -179,14 +180,19 @@ app.get('/create_class',function(req, res) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
 
-          // var pushNotification = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
-          // var notification = new Notification("New class has been scheduled: " + 
-          //   req.query.start + ", " + 
-          //   req.query.duration + ", " + 
-          //   req.query.title + ", " + 
-          //   req.query.description);
-          // pushNotification.send(notification, function(error, response, body) {
-          // });
+
+          var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
+          var message = PushMessageBuilder.Message.alert("New class has been scheduled: " + 
+            req.query.start + ", " + 
+            req.query.duration + ", " + 
+            req.query.title
+          ).build();
+          var notificationExample =  Notification.message(message).build();
+          myPushNotifications.send(notificationExample, function(error, response, body) {
+            console.log("Error: " + error);
+            console.log("Response: " + JSON.stringify(response));
+            console.log("Body: " + body);
+          });
         }
         else {
           title_string="{\"added\":\"DB insert error\"}";
