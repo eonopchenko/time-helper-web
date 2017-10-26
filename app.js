@@ -180,7 +180,6 @@ app.get('/create_class',function(req, res) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
 
-
           var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
           var message = PushMessageBuilder.Message.alert("New class has been scheduled: " + 
             req.query.start + ", " + 
@@ -246,6 +245,18 @@ app.get('/update_class',function(req, res) {
         db.insert(update_obj, function(err, data) {
           if(!err) {
             console.log("Updated doc.");
+            var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
+            var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
+              req.query.upd_start + ", " + 
+              req.query.upd_duration + ", " + 
+              req.query.upd_class_title
+            ).build();
+            var notificationExample =  Notification.message(message).build();
+            myPushNotifications.send(notificationExample, function(error, response, body) {
+              console.log("Error: " + error);
+              console.log("Response: " + JSON.stringify(response));
+              console.log("Body: " + body);
+            });
             class_string="{\"updated\":\"updated\"}";
             res.contentType('application/json');
             res.send(JSON.parse(class_string));
@@ -293,10 +304,21 @@ app.get('/remove_class',function(req, res) {
           }
         }
         if(total_rows !== 0) {
-          console.log("Removed class");
           db.destroy(id_to_remove, rev_to_remove, function(err) {
             if(!err) {
               console.log("Removed class");
+              var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
+              var message = PushMessageBuilder.Message.alert("Class has been removed: " + 
+                req.query.start + ", " + 
+                req.query.duration + ", " + 
+                req.query.title
+              ).build();
+              var notificationExample =  Notification.message(message).build();
+              myPushNotifications.send(notificationExample, function(error, response, body) {
+                console.log("Error: " + error);
+                console.log("Response: " + JSON.stringify(response));
+                console.log("Body: " + body);
+              });
               class_string="{\"removed\":\"removed\"}";
               res.contentType('application/json');
               res.send(JSON.parse(class_string));
