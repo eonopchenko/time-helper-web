@@ -158,14 +158,6 @@ app.get('/fill_remove_update_classes_dropdown', function(req, res) {
   });
 });
 
-app.get('/account',function(req,res) {
-  res.render('account', {
-      name: name, 
-      email: email,
-      picture: picture
-  });
-});
-
 app.get('/create_class',function(req, res) {
   var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
   var title_string;
