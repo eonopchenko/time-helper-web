@@ -70,7 +70,9 @@ $(document).ready(function() {
 					"type: 'GET'," + 
 					"dataType: 'json'," + 
 					"data: {" + 
-						"start: '" + data[i].start + "'" + 
+						"start: '" + data[i].start + "'," + 
+						"duration: '" + data[i].duration + "'," + 
+						"title: '" + data[i].title + "'" + 
 					"}," + 
 					"contentType: 'application/json'," + 
 					"cache: true," + 
@@ -81,6 +83,8 @@ $(document).ready(function() {
 					"success: function(data) {" + 
 						"console.log('process success');" + 
 						"document.getElementById('removed_class').style.display='block';" + 
+						/// Refresh page (add table update, using AJAX later)
+						"location.reload(true);" + 
 					"}," + 
 					"error: function() {" + 
 						"console.log('process error');" + 
@@ -178,7 +182,8 @@ $(document).ready(function() {
 					document.getElementById("create_class_form").style.display="none";
 	 				document.getElementById("created_class").style.display="block";
 				}
-				location.reload(true)
+				/// Refresh page (add table update, using AJAX later)
+				location.reload(true);
 			},
 			error: function() {
 				console.log('process error');
@@ -209,7 +214,8 @@ $(document).ready(function() {
 					document.getElementById("update_class_form").style.display="none";
 	 				document.getElementById("updated_class").style.display="block";
 				 }
-				 location.reload(true)
+				 /// Refresh page (add table update, using AJAX later)
+				 location.reload(true);
 	 		}
 	 	});
 	 });

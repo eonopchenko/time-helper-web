@@ -20,10 +20,6 @@ app.set('view engine', 'ejs');
 
 app.use(express.static("views"));
 
-var name = "";
-var email = "";
-var picture = "";
-
 ///--- CLOUDANT SETTINGS ---///
 var cloudant_url = 'https://dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix:397e251ab62bc131be9b552263a174e7d6701f4c261f8f0ed55853e4867e6b00@dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix.cloudant.com';
 var cloudant_instance = сloudant({url: cloudant_url});
@@ -32,16 +28,13 @@ db = cloudant_instance.db.use('timetable_db');
 ///--- LOCAL LOGIN ---///
 if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
-    name = "User";
-    email = "user@mail.com";
-    picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
     var permissions_db = cloudant_instance.db.use('user_permissions_db');
     permissions_db.get(email, function(err, data) {
       if(data) {
         res.render('landing', {
-          name: name, 
-          email: email,
-          picture: picture
+          name: "User", 
+          email: "user@mail.com",
+          picture: "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png"
         });
       }
     });
@@ -90,13 +83,11 @@ else {
     var accessToken = req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT].accessToken;
   
     bluemix_appid.UserAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
-      name = req.user.name;
-      email = req.user.email;
-      picture = req.user.picture;
+      req.session.email = req.user.email;
       res.render('landing', {
-          name: name, 
-          email: email,
-          picture: picture
+          name: req.user.name, 
+          email: req.user.email,
+          picture: req.user.picture
       });
     });
   });
@@ -123,7 +114,7 @@ app.get('/fill_remove_update_classes_dropdown', function(req, res) {
       var descriptions_array = [];
 
       for(var i = 0; i < user_data.length; i++) {
-        if(user_data[i].value[5] == email) {
+        if(user_data[i].value[5] == req.session.email) {
           start_times_array.push(user_data[i].value[1]);
           durations_array.push(user_data[i].value[2]);
           titles_array.push(user_data[i].value[3]);
@@ -167,7 +158,7 @@ app.get('/create_class',function(req, res) {
   }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       console.log("Recived: " + JSON.stringify(req.query));
-      req.query.user = email;
+      req.query.user = req.session.email;
       db.insert(req.query, function(err, data) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
@@ -229,7 +220,7 @@ app.get('/update_class',function(req, res) {
         "\"duration\":\"" + req.query.upd_duration + "\", " + 
         "\"title\":\"" + req.query.upd_class_title + "\", " + 
         "\"description\":\"" + req.query.upd_class_description + "\"," + 
-        "\"user\":\"" + email + "\"" + 
+        "\"user\":\"" + req.session.email + "\"" + 
         "}";
 
       var update_obj = JSON.parse(string_to_update);
