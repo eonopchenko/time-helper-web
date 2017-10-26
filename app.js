@@ -29,7 +29,7 @@ db = cloudant_instance.db.use('timetable_db');
 if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     var permissions_db = cloudant_instance.db.use('user_permissions_db');
-    permissions_db.get(email, function(err, data) {
+    permissions_db.get("user@mail.com", function(err, data) {
       if(data) {
         res.render('landing', {
           name: "User", 
@@ -57,7 +57,7 @@ else {
       secure: true
     }
   }));
-
+  
   app.use(passport.initialize());
   app.use(passport.session());
   
@@ -112,9 +112,9 @@ app.get('/fill_remove_update_classes_dropdown', function(req, res) {
       var durations_array = [];
       var titles_array = [];
       var descriptions_array = [];
-
+      
       for(var i = 0; i < user_data.length; i++) {
-        if(user_data[i].value[5] == req.session.email) {
+        if(user_data[i].value[5] == ((req.session == null) ? "user@mail.com" : req.session.email)) {
           start_times_array.push(user_data[i].value[1]);
           durations_array.push(user_data[i].value[2]);
           titles_array.push(user_data[i].value[3]);
@@ -158,7 +158,7 @@ app.get('/create_class',function(req, res) {
   }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       console.log("Recived: " + JSON.stringify(req.query));
-      req.query.user = req.session.email;
+      req.query.user = ((req.session == null) ? "user@mail.com" : req.session.email);
       db.insert(req.query, function(err, data) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
@@ -220,7 +220,7 @@ app.get('/update_class',function(req, res) {
         "\"duration\":\"" + req.query.upd_duration + "\", " + 
         "\"title\":\"" + req.query.upd_class_title + "\", " + 
         "\"description\":\"" + req.query.upd_class_description + "\"," + 
-        "\"user\":\"" + req.session.email + "\"" + 
+        "\"user\":\"" + ((req.session == null) ? "user@mail.com" : req.session.email) + "\"" + 
         "}";
 
       var update_obj = JSON.parse(string_to_update);
