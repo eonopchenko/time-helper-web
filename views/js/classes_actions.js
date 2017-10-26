@@ -178,6 +178,7 @@ $(document).ready(function() {
 					document.getElementById("create_class_form").style.display="none";
 	 				document.getElementById("created_class").style.display="block";
 				}
+				location.reload(true)
 			},
 			error: function() {
 				console.log('process error');
