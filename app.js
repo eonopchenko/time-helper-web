@@ -179,14 +179,14 @@ app.get('/create_class',function(req, res) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
 
-          var pushNotification = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
-          var notification = new Notification("New class has been scheduled: " + 
-            req.query.start + ", " + 
-            req.query.duration + ", " + 
-            req.query.title + ", " + 
-            req.query.description);
-          pushNotification.send(notification, function(error, response, body) {
-          });
+          // var pushNotification = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
+          // var notification = new Notification("New class has been scheduled: " + 
+          //   req.query.start + ", " + 
+          //   req.query.duration + ", " + 
+          //   req.query.title + ", " + 
+          //   req.query.description);
+          // pushNotification.send(notification, function(error, response, body) {
+          // });
         }
         else {
           title_string="{\"added\":\"DB insert error\"}";

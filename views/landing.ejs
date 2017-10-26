@@ -77,39 +77,30 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="row">
-                            <div class='col-md-2'>
-                                <div class="form-group">
-                                    <div class='input-group date' id='create_duration_datetimepicker'>
-                                        <input type='text' class="form-control" id='create_duration' name="create_duration"/>
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <script type="text/javascript">
-                                $(function() {
-                                    $('#create_duration_datetimepicker').datetimepicker({
-                                        format: 'hh:mm'
-                                    });
-                                });
-                            </script>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-lg-10 col-lg-offset-2">
-                            <button id="create_class_button" type="submit" class="btn btn-success">Create class</button>
-                        </div>
+                        <select class="form-control" id="create_duration">
+                            <option>00:30</option>
+                            <option>01:00</option>
+                            <option>01:30</option>
+                            <option>02:00</option>
+                            <option>02:30</option>
+                            <option>03:00</option>
+                            <option>03:30</option>
+                            <option>04:00</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <div class="col-md-4">
                             <input type="text" autocomplete="off" class="form-control" id="create_class_title" name="create_class_title" placeholder="Enter class title"/>
                         </div>
-                        <div class="form-group">
-                            <div class="col-md-4">
-                                <input type="text" autocomplete="off" class="form-control" id="create_class_description" name="create_class_description" placeholder="Enter class description"/>
-                            </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            <input type="text" autocomplete="off" class="form-control" id="create_class_description" name="create_class_description" placeholder="Enter class description"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-10 col-lg-offset-2">
+                            <button id="create_class_button" type="submit" class="btn btn-success">Create class</button>
                         </div>
                     </div>
                 </fieldset>
@@ -142,25 +133,16 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="row">
-                            <div class='col-md-2'>
-                                <div class="form-group">
-                                    <div class='input-group date' id='upd_duration_datetimepicker'>
-                                        <input type='text' class="form-control" id='upd_duration' name="upd_duration"/>
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <script type="text/javascript">
-                                $(function() {
-                                    $('#upd_duration_datetimepicker').datetimepicker({
-                                        format: 'hh:mm'
-                                    });
-                                });
-                            </script>
-                        </div>
+                        <select class="form-control" id="create_duration">
+                            <option>00:30</option>
+                            <option>01:00</option>
+                            <option>01:30</option>
+                            <option>02:00</option>
+                            <option>02:30</option>
+                            <option>03:00</option>
+                            <option>03:30</option>
+                            <option>04:00</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <div class="col-md-4">

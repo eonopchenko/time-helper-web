@@ -9,10 +9,11 @@
   },
   "dependencies": {
     "bluemix-appid": "^1.1.2",
-    "bluemix-push-notifications": "*",
+    "bluemix-push-notifications": "^0.3.1",
     "cfenv": "^1.0.3",
     "cloudant": "^1.8.0",
     "ejs": "^2.5.7",
+    "eslint": "^4.9.0",
     "express": "^4.16.2",
     "express-enforces-ssl": "^1.1.0",
     "express-session": "^1.15.5",
