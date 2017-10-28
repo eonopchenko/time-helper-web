@@ -91,7 +91,8 @@ if (cfenv.getAppEnv().isLocal) {
             class_id: class_id_array,
             class_start: class_start_array,
             class_duration: class_duration_array,
-            class_title: class_title_array
+            class_title: class_title_array,
+            permission: req.session.permission
           });
         });
       });

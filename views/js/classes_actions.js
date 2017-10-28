@@ -13,7 +13,8 @@ $(document).ready(function() {
 		},
 		success: function(data) {
 			document.getElementById("create_class_form").style.display="none";
-
+			var welcome = document.getElementById("welcome").innerHTML;
+			var permission = welcome.search("student") != -1 ? "student" : "lecturer";
 			for(var i = 0; i < data.length; i++) {
 				var start = moment(data[i].start, "DD/MM/YYYY hh:mm A");
 				var duration = data[i].duration;
@@ -45,6 +46,7 @@ $(document).ready(function() {
 
 				(document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML = 
 				'<div id="over" style="z-index: 1;height: ' + (cells * 100) + 'px;color: ' + textColors[colorIndex] + ';background: ' + backgroundColors[colorIndex] +'; margin-left: auto; margin-right: auto; display: block;">' + 
+				(permission == "lecturer" ? (
 				"<button type=\"button\" onclick=\"" + 
 					"document.getElementById('update_class_form').style.display='block';" + 
 					"document.getElementById('create_class_form').style.display='none';" + 
@@ -86,7 +88,7 @@ $(document).ready(function() {
 				"});\"" + 
 				"class=\"btn\" style=\"background-color:" + backgroundColors[colorIndex] + ";margin-left: auto;margin-right: 0;float: right;\">" + 
 				"<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>" + 
-				"</button>" + 
+				"</button>") : "") + 
 				'<img src="img/pin.png" width="42" height="42">' + 
 				"<h4>" + 
 				"<p><strong># " + data[i].title + "</strong></p>" + 
@@ -130,7 +132,7 @@ $(document).ready(function() {
 
 					if((document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML == "&nbsp;") {
 						(document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML = 
-						"<div>" + 
+						"<div>" + (permission == "lecturer" ? (
 						"<button type=\"button\" onclick=\"" + 
 						"document.getElementById('create_class_form').style.display='block';" + 
 						"document.getElementById('update_class_form').style.display='none';" + 
@@ -138,7 +140,7 @@ $(document).ready(function() {
 						"\"" + 
 						"class=\"btn\" style=\"background-color: #EDEDEE;width: 100%;height: 99px;\">" + 
 						"<span aria-hidden='true'></span>" + 
-						"</button>" + 
+						"</button>") : "") + 
 						"</div>";
 					}
 				}
