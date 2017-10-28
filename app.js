@@ -46,7 +46,7 @@ if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     
     req.session.name = "User";
-    req.session.email = "student1@mail.com";
+    req.session.email = "student@mail.com";
     req.session.picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
     req.session.permission = "lecturer";
 
@@ -55,6 +55,7 @@ if (cfenv.getAppEnv().isLocal) {
     var class_start_array = new Array();
     var class_duration_array = new Array();
     var class_title_array = new Array();
+    var enrolled_class_array = new Array();
 
     student_timetable_db.find({selector:{studentId:req.session.email}}, function(er1, result1) {
       if (er1) {
@@ -76,6 +77,14 @@ if (cfenv.getAppEnv().isLocal) {
               class_start_array.push(result3.docs[i].start);
               class_duration_array.push(result3.docs[i].duration);
               class_title_array.push(result3.docs[i].title);
+              var enrolled = false;
+              for (var j = 0; j < result1.docs.length; j++) {
+                if(result3.docs[i]._id == result1.docs[j].classId) {
+                  enrolled = true;
+                  break;
+                }
+              }
+              enrolled_class_array.push(enrolled ? "checked" : "");
             }
           }
 
@@ -92,6 +101,7 @@ if (cfenv.getAppEnv().isLocal) {
             class_start: class_start_array,
             class_duration: class_duration_array,
             class_title: class_title_array,
+            enrolled_class: enrolled_class_array,
             permission: req.session.permission
           });
         });
@@ -140,11 +150,68 @@ else {
     var accessToken = req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT].accessToken;
   
     bluemix_appid.UserAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
+
+      req.session.name = req.user.name;
       req.session.email = req.user.email;
-      res.render('landing', {
-          name: req.user.name, 
-          email: req.user.email,
-          picture: req.user.picture
+      req.session.picture = req.user.picture;
+      req.session.permission = "lecturer";
+  
+      /// 0 - not registered yet, 1 - student, 2 - lecturer
+      var class_id_array = new Array();
+      var class_start_array = new Array();
+      var class_duration_array = new Array();
+      var class_title_array = new Array();
+      var enrolled_class_array = new Array();
+  
+      student_timetable_db.find({selector:{studentId:req.session.email}}, function(er1, result1) {
+        if (er1) {
+          throw er1;
+        }
+  
+        timetable_db.find({selector:{user:req.session.email}}, function(er2, result2) {
+          if (er2) {
+            throw er2;
+          }
+  
+          timetable_db.find({selector:{}}, function(er3, result3) {
+            if (er3) {
+              throw er3;
+            }
+            if(result3.docs.length != 0) {
+              for (var i = 0; i < result3.docs.length; i++) {
+                class_id_array.push(result3.docs[i]._id);
+                class_start_array.push(result3.docs[i].start);
+                class_duration_array.push(result3.docs[i].duration);
+                class_title_array.push(result3.docs[i].title);
+                var enrolled = false;
+                for (var j = 0; j < result1.docs.length; j++) {
+                  if(result3.docs[i]._id == result1.docs[j].classId) {
+                    enrolled = true;
+                    break;
+                  }
+                }
+                enrolled_class_array.push(enrolled ? "checked" : "");
+              }
+            }
+  
+            if(result1.docs.length != 0) {
+              req.session.permission = "student";
+            }
+  
+            res.render('landing', {
+              name: req.session.name, 
+              email: req.session.email,
+              picture: req.session.picture,
+              showmodal: ((result1.docs.length == 0) && (result2.docs.length == 0)),
+              class_id: class_id_array,
+              class_start: class_start_array,
+              class_duration: class_duration_array,
+              class_title: class_title_array,
+              enrolled_class: enrolled_class_array,
+              permission: req.session.permission
+            });
+          });
+        });
       });
     });
   });
@@ -168,24 +235,62 @@ app.get('/login_lecturer',function(req, res) {
 });
 
 app.get('/login_student',function(req, res) {
-    var obj_array = new Array();
 
-    for(var i = 0; i < req.query.classes.length; i++) {
-      var classid = req.query.classes[i];
-      classid = classid.slice(0, -1);
-      obj_array.push({"studentId": req.session.email, "classId": classid});
-    }
+  res.contentType('application/json');
 
-    student_timetable_db.bulk({docs:obj_array}, function(err, data) {
-      res.contentType('application/json');
-      if(!err) {
-        res.send(JSON.parse("{\"success\":\"true\"}"));
-      } else {
-        res.send(JSON.parse("{\"success\":\"false\"}"));
+  if (req.query.added_classes || req.query.removed_classes) {
+
+    if (req.query.added_classes) {
+      var obj_array = new Array();
+
+      for(var i = 0; i < req.query.added_classes.length; i++) {
+        var classid = req.query.added_classes[i];
+        obj_array.push({"studentId": req.session.email, "classId": classid});
       }
-    });
-});
 
+      student_timetable_db.bulk({docs:obj_array}, function(err, data) {
+        if(err) {
+          console.log(err);
+        }
+        if (req.query.removed_classes) {
+          var obj_array = new Array();
+
+          for(var i = 0; i < req.query.removed_classes.length; i++) {
+            var classid = req.query.removed_classes[i];
+            student_timetable_db.find({selector:{studentId:req.session.email, classId:classid}}, function(er, result) {
+              if(er) {
+                console.log(er);
+              }
+              if (result && result.docs && result.docs.length) {
+                student_timetable_db.destroy(result.docs[0]._id, result.docs[0]._rev, function(err) {
+                  res.send(JSON.parse("{\"success\":\"true\"}"));
+                });
+              }
+            });
+          }
+        } else {
+          res.send(JSON.parse("{\"success\":\"true\"}"));
+        }
+      });
+    } else if (req.query.removed_classes) {
+      var obj_array = new Array();
+
+      for(var i = 0; i < req.query.removed_classes.length; i++) {
+        var classid = req.query.removed_classes[i];
+        student_timetable_db.find({selector:{studentId:req.session.email, classId:classid}}, function(er, result) {
+          if (result && result.docs && result.docs.length) {
+            student_timetable_db.destroy(result.docs[0]._id, result.docs[0]._rev, function(err) {
+              if(err) {
+                console.log(err);
+              }
+              res.send(JSON.parse("{\"success\":\"true\"}"));
+            });
+          }
+        });
+      }
+    }
+  }
+});
 
 app.get('/fill_schedule_table', function(req, res) {
   /// @todo refactor (rough hack to sort async tasks out)
@@ -202,10 +307,12 @@ app.get('/fill_schedule_table', function(req, res) {
       }
 
       timetable_db.find({selector:{}}, function(er, result2) {
-        for (var i = 0; i < result2.docs.length; i++) {
-          for (var j = 0; j < ids.length; j++) {
-            if(ids[j] == result2.docs[i]._id) {
-              obj_array.push(result2.docs[i]);
+        if(result2) {
+          for (var i = 0; i < result2.docs.length; i++) {
+            for (var j = 0; j < ids.length; j++) {
+              if(ids[j] == result2.docs[i]._id) {
+                obj_array.push(result2.docs[i]);
+              }
             }
           }
         }

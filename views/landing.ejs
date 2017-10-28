@@ -35,8 +35,8 @@
         </div>
     </div>
     <div class="container form_details">
-        <div id="reenroll_button" style="display:none">
-            <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#myModal">
+        <div id="reenroll_button_div" style="display:none">
+            <button id="reenroll_button" type="button" class="btn btn-primary btn-md">
                 Re-enroll
             </button>
         </div>
@@ -386,7 +386,7 @@
                 <table id="enrollView" class="table">
                     <% for(var i=0; i < class_id.length; i++) { %>
                     <tr>
-                        <td><input type="checkbox" name=<%= class_id[i] %>/>&nbsp;</td>
+                        <td><input type="checkbox" name=<%= class_id[i] %> /<%= enrolled_class[i] %>/ />&nbsp;</td>
                         <td><%= class_start[i] %></td>
                         <td><%= class_duration[i] %></td>
                         <td><%= class_title[i] %></td>

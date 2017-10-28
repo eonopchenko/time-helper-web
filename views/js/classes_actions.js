@@ -1,5 +1,5 @@
 $(document).ready(function() {
-
+	var checked_classes_array = new Array();
 	$.ajax({
 		url: "/fill_schedule_table",
 		type: "GET",
@@ -15,6 +15,10 @@ $(document).ready(function() {
 			document.getElementById("create_class_form").style.display="none";
 			var welcome = document.getElementById("welcome").innerHTML;
 			var permission = welcome.search("student") != -1 ? "student" : "lecturer";
+			if (permission == "student") {
+				document.getElementById("reenroll_button_div").style.display='block';
+			}
+
 			for(var i = 0; i < data.length; i++) {
 				var start = moment(data[i].start, "DD/MM/YYYY hh:mm A");
 				var duration = data[i].duration;
@@ -153,30 +157,56 @@ $(document).ready(function() {
 
 	$("#button_login_student").click(function(e) {
 		e.preventDefault();
-		var classes_array = new Array();
+		var added_classes_array = new Array();
+		var removed_classes_array = new Array();
 		var t = document.getElementById("enrollView");
 		var checkboxes = t.getElementsByTagName("input");
 		for(var i = 0; i < checkboxes.length; i++) {
 			if(checkboxes[i].checked) {
-				classes_array.push(checkboxes[i].name);
+				var found = false;
+				for(var j = 0; j < checked_classes_array.length; j++) {
+					if(checkboxes[i].name == checked_classes_array[j]) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					added_classes_array.push(checkboxes[i].name);
+				}
 			}
 		}
+		for(var i = 0; i < checked_classes_array.length; i++) {
+			var found = false;
+			for(var j = 0; j < checkboxes.length; j++) {
+				if(!checkboxes[j].checked && (checked_classes_array[i] == checkboxes[j].name)) {
+					console.log("checked_classes_array[i] = " + checked_classes_array[i]);
+					console.log("checkboxes[j].name = " + checkboxes[j].name);
+					found = true;
+					break;
+				}
+			}
+			if(found) {
+				removed_classes_array.push(checked_classes_array[i]);
+			}
+		}
+		
 		$.ajax({
 			url: "/login_student",
 			type: "GET",
 			dataType: "json",
 			data: {
-				classes: classes_array
+				added_classes: added_classes_array,
+				removed_classes: removed_classes_array,
 			},
 			contentType: "application/json",
 			cache: true,
 			timeout: 5000,
 			complete: function() {
 			  console.log('process complete');
+			  location.reload(true);
 			},
 			success: function(data) {
 				console.log('process success');
-				location.reload(true);
 			},
 			error: function() {
 				console.log('process error');
@@ -209,6 +239,21 @@ $(document).ready(function() {
 				console.log('process error');
 			},
 		});
+	});
+
+	$("#reenroll_button").click(function(e) {
+		e.preventDefault();
+		$("#myModal").modal("show");
+		document.getElementById("button_login_lecturer").style.display = "none";
+		document.getElementById("button_login_student").innerHTML = "Apply";
+		var t = document.getElementById("enrollView");
+		var checkboxes = t.getElementsByTagName("input");
+		checked_classes_array = [];
+		for(var i = 0; i < checkboxes.length; i++) {
+			if(checkboxes[i].checked) {
+				checked_classes_array.push(checkboxes[i].name);
+			}
+		}
 	});
 
 	$("#create_class_button").click(function(e) {
