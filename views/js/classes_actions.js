@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
 	$.ajax({
-		url: "/fill_remove_update_classes_dropdown",
+		url: "/fill_schedule_table",
 		type: "GET",
 		dataType: "json",
 		data:{allclasses: ""},
@@ -12,12 +12,6 @@ $(document).ready(function() {
 		  console.log('process complete');
 		},
 		success: function(data) {
-			var classes_drop_down;
-			for(var i = 0; i < data.length; i++)
-			{
-				var class_option = '<option>' + data[i].title + '</option>';
-				classes_drop_down += class_option;
-			}
 			document.getElementById("create_class_form").style.display="none";
 
 			for(var i = 0; i < data.length; i++) {
@@ -154,9 +148,69 @@ $(document).ready(function() {
 		    console.log('process error');
 		},
 	});
-	Array.prototype.random = function () {
-		return this[Math.floor((Math.random()*this.length))];
-	}
+
+	$("#button_login_student").click(function(e) {
+		e.preventDefault();
+		var classes_array = new Array();
+		var t = document.getElementById("enrollView");
+		var checkboxes = t.getElementsByTagName("input");
+		for(var i = 0; i < checkboxes.length; i++) {
+			if(checkboxes[i].checked) {
+				classes_array.push(checkboxes[i].name);
+			}
+		}
+		$.ajax({
+			url: "/login_student",
+			type: "GET",
+			dataType: "json",
+			data: {
+				classes: classes_array
+			},
+			contentType: "application/json",
+			cache: true,
+			timeout: 5000,
+			complete: function() {
+			  console.log('process complete');
+			},
+			success: function(data) {
+				console.log('process success');
+				if(data.success === "true") {
+				  console.log('real success');
+				}
+				location.reload(true);
+			},
+			error: function() {
+				console.log('process error');
+			},
+		});
+	});
+
+	$("#button_login_lecturer").click(function(e) {
+		e.preventDefault();
+		$.ajax({
+			url: "/login_lecturer",
+			type: "GET",
+			dataType: "json",
+			data: {
+			},
+			contentType: "application/json",
+			cache: true,
+			timeout: 5000,
+			complete: function() {
+			  console.log('process complete');
+			},
+			success: function(data) {
+				console.log('process success');
+				if(data.success === "true") {
+				  console.log('real success');
+				}
+				$("#myModal").modal("hide");
+			},
+			error: function() {
+				console.log('process error');
+			},
+		});
+	});
 
 	$("#create_class_button").click(function(e) {
 		e.preventDefault();

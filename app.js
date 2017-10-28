@@ -24,6 +24,7 @@ app.use(express.static("views"));
 var cloudant_url = 'https://dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix:397e251ab62bc131be9b552263a174e7d6701f4c261f8f0ed55853e4867e6b00@dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix.cloudant.com';
 var cloudant_instance = сloudant({url: cloudant_url});
 timetable_db = cloudant_instance.db.use('timetable_db');
+student_timetable_db = cloudant_instance.db.use('student_timetable_db');
 
 app.use(helmet());
 app.use(helmet.noCache());
@@ -44,7 +45,7 @@ if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     
     req.session.name = "User";
-    req.session.email = "user@mail.com";
+    req.session.email = "student@mail.com";
     req.session.picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
 
     /// 0 - not registered yet, 1 - student, 2 - lecturer
@@ -52,7 +53,6 @@ if (cfenv.getAppEnv().isLocal) {
     var class_start_array = new Array();
     var class_duration_array = new Array();
     var class_title_array = new Array();
-    var student_timetable_db = cloudant_instance.db.use('student_timetable_db');
 
     student_timetable_db.find({selector:{studentId:req.session.email}}, function(er1, result1) {
       if (er1) {
@@ -148,18 +148,38 @@ app.get('/',function(req,res) {
   res.sendfile(__dirname + '/views/index.html');
 });
 
-app.get('/fill_remove_update_classes_dropdown', function(req, res) {
+app.get('/login_lecturer',function(req, res) {
   var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
-  // timetable_db.find({selector:{user:'jake.spb@gmail.com'}}, function(er, result) {
-  //   if (er) {
-  //     throw er;
-  //   }
-   
-  //   console.log('Found %d documents with name Alice', result.docs.length);
-  //   for (var i = 0; i < result.docs.length; i++) {
-  //     console.log('  Doc id: %s', result.docs[i].user);
-  //   }
-  // });
+  request({
+    url: url, 
+    json: true
+  }, function (error, response, body) {
+    res.contentType('application/json');
+    res.send(JSON.parse("{\"success\":\"true\"}"));
+  });
+});
+
+app.get('/login_student',function(req, res) {
+    var obj_array = new Array();
+
+    for(var i = 0; i < req.query.classes.length; i++) {
+      var classid = req.query.classes[i];
+      classid = classid.slice(0, -1);
+      obj_array.push({"studentId": req.session.email, "classId": classid});
+    }
+
+    student_timetable_db.bulk({docs:obj_array}, function(err, data) {
+      res.contentType('application/json');
+      if(!err) {
+        res.send(JSON.parse("{\"success\":\"true\"}"));
+      } else {
+        res.send(JSON.parse("{\"success\":\"false\"}"));
+      }
+    });
+});
+
+app.get('/fill_schedule_table', function(req, res) {
+  var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
   request({
     url: url, 
     json: true
@@ -173,7 +193,7 @@ app.get('/fill_remove_update_classes_dropdown', function(req, res) {
       var descriptions_array = [];
       
       for(var i = 0; i < user_data.length; i++) {
-        if(user_data[i].value[5] == ((req.session == null) ? "user@mail.com" : req.session.email)) {
+        if(user_data[i].value[5] == req.session.email) {
           start_times_array.push(user_data[i].value[1]);
           durations_array.push(user_data[i].value[2]);
           titles_array.push(user_data[i].value[3]);
@@ -217,7 +237,7 @@ app.get('/create_class',function(req, res) {
   }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       console.log("Recived: " + JSON.stringify(req.query));
-      req.query.user = ((req.session == null) ? "user@mail.com" : req.session.email);
+      req.query.user = req.session.email;
       timetable_db.insert(req.query, function(err, data) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
@@ -228,7 +248,7 @@ app.get('/create_class',function(req, res) {
             req.query.duration + ", " + 
             req.query.title
           ).build();
-          var target = PushMessageBuilder.Target.userIds(((req.session == null) ? "user@mail.com" : req.session.email)).build();
+          var target = PushMessageBuilder.Target.userIds(req.session.email).build();
           var notificationExample =  Notification.message(message).target(target).build();
           myPushNotifications.send(notificationExample, function(error, response, body) {
             console.log("Error: " + error);
@@ -280,7 +300,7 @@ app.get('/update_class',function(req, res) {
         "\"duration\":\"" + req.query.upd_duration + "\", " + 
         "\"title\":\"" + req.query.upd_class_title + "\", " + 
         "\"description\":\"" + req.query.upd_class_description + "\"," + 
-        "\"user\":\"" + ((req.session == null) ? "user@mail.com" : req.session.email) + "\"" + 
+        "\"user\":\"" + req.session.email + "\"" + 
         "}";
 
       var update_obj = JSON.parse(string_to_update);
