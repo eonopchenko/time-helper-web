@@ -174,9 +174,6 @@ $(document).ready(function() {
 			},
 			success: function(data) {
 				console.log('process success');
-				if(data.success === "true") {
-				  console.log('real success');
-				}
 				location.reload(true);
 			},
 			error: function() {

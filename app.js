@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const express_enforces_ssl = require("express-enforces-ssl");
 const cfenv = require("cfenv");
 const сloudant = require('cloudant');
+const Promise = require('promise');
 const bluemix_push_notifications = require('bluemix-push-notifications');
 const PushNotifications = bluemix_push_notifications.PushNotifications;
 const Notification = bluemix_push_notifications.Notification;
@@ -45,8 +46,9 @@ if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     
     req.session.name = "User";
-    req.session.email = "student@mail.com";
+    req.session.email = "student1@mail.com";
     req.session.picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
+    req.session.permission = "lecturer";
 
     /// 0 - not registered yet, 1 - student, 2 - lecturer
     var class_id_array = new Array();
@@ -76,6 +78,11 @@ if (cfenv.getAppEnv().isLocal) {
               class_title_array.push(result3.docs[i].title);
             }
           }
+
+          if(result1.docs.length != 0) {
+            req.session.permission = "student";
+          }
+
           res.render('landing', {
             name: req.session.name, 
             email: req.session.email,
@@ -178,54 +185,46 @@ app.get('/login_student',function(req, res) {
     });
 });
 
+
 app.get('/fill_schedule_table', function(req, res) {
-  var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
-  request({
-    url: url, 
-    json: true
-  }, function (error, response, body) {
-    if (!error && response.statusCode === 200) {
-      var user_data = body.rows;
-      var list_of_classes = '[';
-      var start_times_array = [];
-      var durations_array = [];
-      var titles_array = [];
-      var descriptions_array = [];
+  /// @todo refactor (rough hack to sort async tasks out)
+  if (req.session.permission == "student") {
+    student_timetable_db.find({selector:{studentId:req.session.email}}, function(er, result1) {
+      if (er) {
+        throw er;
+      }
       
-      for(var i = 0; i < user_data.length; i++) {
-        if(user_data[i].value[5] == req.session.email) {
-          start_times_array.push(user_data[i].value[1]);
-          durations_array.push(user_data[i].value[2]);
-          titles_array.push(user_data[i].value[3]);
-          descriptions_array.push(user_data[i].value[4]);
-        }
+      var obj_array = new Array();
+      var ids = new Array();
+      for (var i = 0; i < result1.docs.length; i++) {
+        ids.push(result1.docs[i].classId);
       }
 
-      for(var i = 0; i < titles_array.length; i++) {
-        var json_block = 
-        '{' + 
-        '\"start\":\"' + start_times_array[i] + '\",' + 
-        '\"duration\":\"' + durations_array[i] + '\",' + 
-        '\"title\":\"' + titles_array[i] + '\",' + 
-        '\"description\":\"' + descriptions_array[i] + '\"' + 
-        '}';
-        if(i !== 0) {
-          list_of_classes = list_of_classes.concat(",");
+      timetable_db.find({selector:{}}, function(er, result2) {
+        for (var i = 0; i < result2.docs.length; i++) {
+          for (var j = 0; j < ids.length; j++) {
+            if(ids[j] == result2.docs[i]._id) {
+              obj_array.push(result2.docs[i]);
+            }
+          }
         }
-        list_of_classes = list_of_classes.concat(json_block);
+        res.send(obj_array);
+      });
+    });
+  } else if (req.session.permission == "lecturer") {
+    timetable_db.find({selector:{user:req.session.email}}, function(er, result) {
+      if (er) {
+        throw er;
       }
-
-      list_of_classes = list_of_classes.concat("]");
-      res.contentType('application/json');
-      res.send(JSON.parse(list_of_classes));
-    } else {
-      console.log("No data from URL");
-      console.log("Response is : " + response.statusCode);
-      var class_string="{\"added\":\"DB read error\"}";
-      res.contentType('application/json');
-      res.send(JSON.parse(class_string));
-    }
-  });
+      
+      var obj_array = new Array();
+      var ids = new Array();
+      for (var i = 0; i < result.docs.length; i++) {
+        obj_array.push(result.docs[i]);
+      }
+      res.send(obj_array);
+    });
+  }
 });
 
 app.get('/create_class',function(req, res) {
@@ -236,7 +235,7 @@ app.get('/create_class',function(req, res) {
     json: true
   }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      console.log("Recived: " + JSON.stringify(req.query));
+      // console.log("Received: " + JSON.stringify(req.query));
       req.query.user = req.session.email;
       timetable_db.insert(req.query, function(err, data) {
         if (!err) {
@@ -251,9 +250,9 @@ app.get('/create_class',function(req, res) {
           var target = PushMessageBuilder.Target.userIds(req.session.email).build();
           var notificationExample =  Notification.message(message).target(target).build();
           myPushNotifications.send(notificationExample, function(error, response, body) {
-            console.log("Error: " + error);
-            console.log("Response: " + JSON.stringify(response));
-            console.log("Body: " + body);
+            // console.log("Error: " + error);
+            // console.log("Response: " + JSON.stringify(response));
+            // console.log("Body: " + body);
           });
         }
         else {
@@ -272,7 +271,7 @@ app.get('/create_class',function(req, res) {
 });
 
 app.get('/update_class',function(req, res) {
-  console.log("Received : " + JSON.stringify(req.query));
+  // console.log("Received : " + JSON.stringify(req.query));
   var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
   request({
     url: url, 
@@ -307,7 +306,7 @@ app.get('/update_class',function(req, res) {
       if(total_rows !== 0) {
         timetable_db.insert(update_obj, function(err, data) {
           if(!err) {
-            console.log("Updated doc.");
+            // console.log("Updated doc.");
             var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
             var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
               req.query.upd_start + ", " + 
@@ -316,28 +315,28 @@ app.get('/update_class',function(req, res) {
             ).build();
             var notificationExample =  Notification.message(message).build();
             myPushNotifications.send(notificationExample, function(error, response, body) {
-              console.log("Error: " + error);
-              console.log("Response: " + JSON.stringify(response));
-              console.log("Body: " + body);
+              // console.log("Error: " + error);
+              // console.log("Response: " + JSON.stringify(response));
+              // console.log("Body: " + body);
             });
             class_string="{\"updated\":\"updated\"}";
             res.contentType('application/json');
             res.send(JSON.parse(class_string));
           } else {
-            console.log("Couldn't update class " + err);
+            // console.log("Couldn't update class " + err);
             class_string="{\"updated\":\"could not update\"}";
             res.contentType('application/json');
             res.send(JSON.parse(class_string));
           }
         });
       } else {
-        console.log("DB is empty");
+        // console.log("DB is empty");
         var class_string="{\"updated\":\"empty database\"}";
         res.contentType('application/json');
         res.send(JSON.parse(class_string));
       }
     } else {
-      console.log("No response from URL. Status : " + response.statusCode);
+      // console.log("No response from URL. Status : " + response.statusCode);
       class_string="{\"updated\":\"DB read error\"}";
       res.contentType('application/json');
       res.send(JSON.parse(class_string));
@@ -346,7 +345,7 @@ app.get('/update_class',function(req, res) {
 });
 
 app.get('/remove_class',function(req, res) {
-  console.log("Class to be removed : = " + req.query.start);
+  // console.log("Class to be removed : = " + req.query.start);
   var url = cloudant_url + "/timetable_db/_design/timetable_db/_view/timetable_db";
   request({
        url: url, 
@@ -369,7 +368,7 @@ app.get('/remove_class',function(req, res) {
         if(total_rows !== 0) {
           timetable_db.destroy(id_to_remove, rev_to_remove, function(err) {
             if(!err) {
-              console.log("Removed class");
+              // console.log("Removed class");
               var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
               var message = PushMessageBuilder.Message.alert("Class has been removed: " + 
                 req.query.start + ", " + 
@@ -378,16 +377,16 @@ app.get('/remove_class',function(req, res) {
               ).build();
               var notificationExample =  Notification.message(message).build();
               myPushNotifications.send(notificationExample, function(error, response, body) {
-                console.log("Error: " + error);
-                console.log("Response: " + JSON.stringify(response));
-                console.log("Body: " + body);
+                // console.log("Error: " + error);
+                // console.log("Response: " + JSON.stringify(response));
+                // console.log("Body: " + body);
               });
               class_string="{\"removed\":\"removed\"}";
               res.contentType('application/json');
               res.send(JSON.parse(class_string));
             } else {
-              console.log("Couldn't remove class");
-              console.log(err);
+              // console.log("Couldn't remove class");
+              // console.log(err);
               class_string="{\"removed\":\"could not remove\"}";
               res.contentType('application/json');
               res.send(JSON.parse(class_string));
@@ -396,7 +395,7 @@ app.get('/remove_class',function(req, res) {
         }
         else
         {
-          console.log("DB is empty");
+          // console.log("DB is empty");
           class_string="{\"removed\":\"empty database\"}";
           res.contentType('application/json');
           res.send(JSON.parse(class_string));
@@ -404,8 +403,8 @@ app.get('/remove_class',function(req, res) {
       }
       else
       {
-        console.log("No data from URL");
-        console.log("Response is : " + response.statusCode);
+        // console.log("No data from URL");
+        // console.log("Response is : " + response.statusCode);
         class_string="{\"removed\":\"DB read error\"}";
         res.contentType('application/json');
         res.send(JSON.parse(class_string));
