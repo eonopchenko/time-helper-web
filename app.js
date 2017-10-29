@@ -30,6 +30,9 @@ student_timetable_db = cloudant_instance.db.use('student_timetable_db');
 app.use(helmet());
 app.use(helmet.noCache());
 
+///--- PUSH NOTIFICATIONS ---///
+var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
+
 ///--- LOCAL LOGIN (for Debug purposes only!) ---///
 if (cfenv.getAppEnv().isLocal) {
 
@@ -46,7 +49,7 @@ if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     
     req.session.name = "User";
-    req.session.email = "lecturer@mail.com";
+    req.session.email = "user@mail.com";
     req.session.picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
     req.session.permission = "lecturer";
 
@@ -346,14 +349,12 @@ app.get('/create_class',function(req, res) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
 
-          var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
           var message = PushMessageBuilder.Message.alert("New class has been scheduled: " + 
             req.query.start + ", " + 
             req.query.duration + ", " + 
             req.query.title
           ).build();
-          var target = PushMessageBuilder.Target.userIds(req.session.email).build();
-          var notificationExample =  Notification.message(message).target(target).build();
+          var notificationExample =  Notification.message(message).build();
           myPushNotifications.send(notificationExample, function(error, response, body) {
             // console.log("Error: " + error);
             // console.log("Response: " + JSON.stringify(response));
@@ -376,7 +377,6 @@ app.get('/create_class',function(req, res) {
 });
 
 app.get('/update_class',function(req, res) {
-  // console.log("Received : " + JSON.stringify(req.query));
   var url = cloudant_url + "/lecturer_timetable_db/_design/lecturer_timetable_db/_view/lecturer_timetable_db";
   request({
     url: url, 
@@ -411,22 +411,30 @@ app.get('/update_class',function(req, res) {
       if(total_rows !== 0) {
         lecturer_timetable_db.insert(update_obj, function(err, data) {
           if(!err) {
-            // console.log("Updated doc.");
-            var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
-            var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
-              req.query.upd_start + ", " + 
-              req.query.upd_duration + ", " + 
-              req.query.upd_class_title
-            ).build();
-            var notificationExample =  Notification.message(message).build();
-            myPushNotifications.send(notificationExample, function(error, response, body) {
-              // console.log("Error: " + error);
-              // console.log("Response: " + JSON.stringify(response));
-              // console.log("Body: " + body);
+            student_timetable_db.find({selector:{classId:id_to_update}}, function(er, result) {
+              
+              var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
+                req.query.upd_start + ", " + 
+                req.query.upd_duration + ", " + 
+                req.query.upd_class_title
+              ).build();
+              
+              if(!er) {
+                if (result && result.docs && (result.docs.length != 0)) {
+                  var ids = new Array();
+                  for(var i = 0; i < result.docs.length; i++) {
+                    ids.push(result.docs[i].studentId);
+                  }
+                  var target = PushMessageBuilder.Target.userIds(ids).build();
+                  var notificationExample =  Notification.message(message).target(target).build();
+                  myPushNotifications.send(notificationExample, function(error, response, body) {
+                  });
+                }
+                class_string="{\"updated\":\"updated\"}";
+                res.contentType('application/json');
+                res.send(JSON.parse(class_string));
+              }
             });
-            class_string="{\"updated\":\"updated\"}";
-            res.contentType('application/json');
-            res.send(JSON.parse(class_string));
           } else {
             // console.log("Couldn't update class " + err);
             class_string="{\"updated\":\"could not update\"}";
@@ -473,22 +481,30 @@ app.get('/remove_class',function(req, res) {
         if(total_rows !== 0) {
           lecturer_timetable_db.destroy(id_to_remove, rev_to_remove, function(err) {
             if(!err) {
-              // console.log("Removed class");
-              var myPushNotifications = new PushNotifications(PushNotifications.Region.SYDNEY, "1e1125cd-32ed-4e96-bb35-ab62cb806322", "a5c93e43-91f2-405d-bbc0-2691a8fdbaaf");
-              var message = PushMessageBuilder.Message.alert("Class has been removed: " + 
-                req.query.start + ", " + 
-                req.query.duration + ", " + 
-                req.query.title
-              ).build();
-              var notificationExample =  Notification.message(message).build();
-              myPushNotifications.send(notificationExample, function(error, response, body) {
-                // console.log("Error: " + error);
-                // console.log("Response: " + JSON.stringify(response));
-                // console.log("Body: " + body);
+              student_timetable_db.find({selector:{classId:id_to_remove}}, function(er, result) {
+                
+                var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
+                  req.query.start + ", " + 
+                  req.query.duration + ", " + 
+                  req.query.title
+                ).build();
+                
+                if(!er) {
+                  if (result && result.docs && (result.docs.length != 0)) {
+                    var ids = new Array();
+                    for(var i = 0; i < result.docs.length; i++) {
+                      ids.push(result.docs[i].studentId);
+                    }
+                    var target = PushMessageBuilder.Target.userIds(ids).build();
+                    var notificationExample =  Notification.message(message).target(target).build();
+                    myPushNotifications.send(notificationExample, function(error, response, body) {
+                    });
+                  }
+                  class_string="{\"removed\":\"removed\"}";
+                  res.contentType('application/json');
+                  res.send(JSON.parse(class_string));
+                }
               });
-              class_string="{\"removed\":\"removed\"}";
-              res.contentType('application/json');
-              res.send(JSON.parse(class_string));
             } else {
               // console.log("Couldn't remove class");
               // console.log(err);
