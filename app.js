@@ -46,7 +46,7 @@ if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     
     req.session.name = "User";
-    req.session.email = "jake.spb@gmail.com";
+    req.session.email = "lecturer@mail.com";
     req.session.picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
     req.session.permission = "lecturer";
 
@@ -391,7 +391,7 @@ app.get('/update_class',function(req, res) {
 
       for (var i = 0; i < user_data.length; i++) {
          var doc = user_data[i];
-        if (doc.value[1] === req.query.upd_start) {
+        if ((doc.value[1] === req.query.upd_start) && (doc.value[5] === req.session.email)) {
           id_to_update = doc.key;
           rev_to_update = doc.value[0];
         }

@@ -20,17 +20,17 @@ $(document).ready(function() {
 			}
 
 			for(var i = 0; i < data.length; i++) {
-				var start = moment(data[i].start, "DD/MM/YYYY hh:mm A");
+				var start = moment(data[i].start, "dddd hh:mm A");
 				var duration = data[i].duration;
 				var sp = duration.split(":");
 				var hours = parseInt(sp[0]);
 				var mins = parseInt(sp[1]);
 
-				var d = start.toDate().getDay() + 1;
-				var m = start.toDate().getMonth() + 1;
-				var y = start.toDate().getYear() + 1900;
+				var d = start.toDate().getDay();
+				// var m = start.toDate().getMonth() + 1;
+				// var y = start.toDate().getYear() + 1900;
 
-				var colIndex = (start.minutes() == 0 ? 1 : 0) + d - 1;
+				var colIndex = (start.minutes() == 0 ? 1 : 0) + d;
 				var rowIndex = ((start.hours() - 9) * 2 + (start.minutes() == 0 ? 0 : 1)) + 2;
 
 				var cells = hours * 2 + (mins == 0 ? 0 : 1);
@@ -54,7 +54,7 @@ $(document).ready(function() {
 				"<button type=\"button\" onclick=\"" + 
 					"document.getElementById('update_class_form').style.display='block';" + 
 					"document.getElementById('create_class_form').style.display='none';" + 
-					"getElementById('upd_start').value = '" + moment(start).format('DD/MM/YYYY hh:mm A') + "';" + 
+					"getElementById('upd_start').value = '" + moment(start).format('dddd hh:mm A') + "';" + 
 					// "document.getElementById('upd_start').value = '" + data[i].start + "';" + 
 					"document.getElementById('upd_duration').value = '" + data[i].duration + "';" + 
 					"document.getElementById('upd_class_title').value = '" + data[i].title + "';" + 
@@ -131,16 +131,17 @@ $(document).ready(function() {
 
 					var hours = Math.floor(((rowIndex - 2) / 2) + 9);
 					var mins = ((rowIndex - 2) % 2 == 0) ? 0 : 30;
-					var dateParts = (document.getElementById("taskView").rows[0].cells[colIndex + ((rowIndex % 2 == 0) ? 0 : 1)]).innerHTML.split("/");
-					var start = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], hours, mins);
-
+					// var dateParts = (document.getElementById("taskView").rows[0].cells[colIndex + ((rowIndex % 2 == 0) ? 0 : 1)]).innerHTML.split("/");
+					// var start = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], hours, mins);
+					// var days = ['Sunday','Monday','Tuesday','Wednesday','Thrusday','Friday','Saturday'];
+					var start = new Date(moment((document.getElementById("taskView").rows[0].cells[colIndex + ((rowIndex % 2 == 0) ? 0 : 1)]).innerHTML + " " + hours + ":" + mins, "dddd hh:mm"));
 					if((document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML == "&nbsp;") {
 						(document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML = 
 						"<div>" + (permission == "lecturer" ? (
 						"<button type=\"button\" onclick=\"" + 
 						"document.getElementById('create_class_form').style.display='block';" + 
 						"document.getElementById('update_class_form').style.display='none';" + 
-						"document.getElementById('create_start').value = '" + moment(start).format('DD/MM/YYYY hh:mm A') + "';" + 
+						"document.getElementById('create_start').value = '" + moment(start).format('dddd hh:mm A') + "';" + 
 						"\"" + 
 						"class=\"btn\" style=\"background-color: #EDEDEE;width: 100%;height: 99px;\">" + 
 						"<span aria-hidden='true'></span>" + 

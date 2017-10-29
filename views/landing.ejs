@@ -61,7 +61,7 @@
                     <legend class="resizables"> New Record Information </legend>
                     <div class="form-group">
                         <div class="row">
-                            <div class='col-sm-6'>
+                            <div class='col-sm-3'>
                                 <div class="form-group">
                                     <div class='input-group date' id='create_datetimepicker'>
                                         <input type='text' class="form-control" id='create_start' name='create_start'/>
@@ -74,7 +74,8 @@
                             <script type="text/javascript">
                                 $(function() {
                                     $('#create_datetimepicker').datetimepicker({
-                                        format: 'DD/MM/YYYY hh:mm A'
+                                        format: 'dddd hh:mm A',
+                                        stepping: '30'
                                     });
                                 });
                             </script>
@@ -117,10 +118,10 @@
                     <legend class="resizables"> Update Class Information </legend>
                     <div class="form-group">
                         <div class="row">
-                            <div class='col-md-2'>
+                            <div class='col-md-3'>
                                 <div class="form-group">
                                     <div class='input-group date' id='upd_datetimepicker'>
-                                        <input type='text' class="form-control" id='upd_start' name='upd_start'/>
+                                        <input type='text' class="form-control" id='upd_start' name='upd_start' readonly/>
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -130,7 +131,8 @@
                             <script type="text/javascript">
                                 $(function() {
                                     $('#upd_datetimepicker').datetimepicker({
-                                        format: 'DD/MM/YYYY hh:mm A'
+                                        format: 'dddd hh:mm A',
+                                        stepping: '30'
                                     });
                                 });
                             </script>
@@ -180,13 +182,13 @@
                         <tbody>
                             <tr>
                                 <th scope="col"></th>
-                                <th id="day1" scope="col" width="14%">01/10/2017</th>
-                                <th id="day2" scope="col" width="14%">02/10/2017</th>
-                                <th id="day3" scope="col" width="14%">03/10/2017</th>
-                                <th id="day4" scope="col" width="14%">04/10/2017</th>
-                                <th id="day5" scope="col" width="14%">05/10/2017</th>
-                                <th id="day6" scope="col" width="14%">06/10/2017</th>
-                                <th id="day7" scope="col" width="14%">07/10/2017</th>
+                                <th id="day1" scope="col" width="14%" style="background-color: #ffffff;">Sunday</th>
+                                <th id="day2" scope="col" width="14%">Monday</th>
+                                <th id="day3" scope="col" width="14%">Tuesday</th>
+                                <th id="day4" scope="col" width="14%">Wednesday</th>
+                                <th id="day5" scope="col" width="14%">Thursday</th>
+                                <th id="day6" scope="col" width="14%">Friday</th>
+                                <th id="day7" scope="col" width="14%" style="background-color: #ffffff;">Saturday</th>
                             </tr>
                             <tr hidden="hidden"></tr>
                             <tr>
