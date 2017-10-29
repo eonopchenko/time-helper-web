@@ -280,7 +280,7 @@ $(document).ready(function() {
 					document.getElementById("create_class_form").style.display="none";
 	 				document.getElementById("created_class").style.display="block";
 				}
-				/// Refresh page (add table update, using AJAX later)
+				/// @todo Refresh page (add table update, using AJAX later)
 				location.reload(true);
 			},
 			error: function() {
