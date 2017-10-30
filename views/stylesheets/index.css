@@ -9,6 +9,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    overflow: hidden
 }
 
 h1 {
@@ -56,6 +57,11 @@ h3 {
     overflow: hidden;
     padding-top: 30px;
     padding-bottom: 30px;
+    background-image: url("/img/bg-header.jpg");
+    background-repeat: no-repeat; 
+    background-attachment:fixed;
+    background-position:top;
+    background-size: 100%;
 
 }
 
@@ -130,7 +136,7 @@ body {
 }
 .bruce{
     margin-top: 0;
-    padding-bottom: 30px
+    padding-bottom: 80px
 }
 .footer {
     position: absolute;
