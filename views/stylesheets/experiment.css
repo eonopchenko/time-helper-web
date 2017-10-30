@@ -9,7 +9,6 @@
 
 #cube {
   position: relative;
-  margin: 10px auto;
   height: 200px;
   width: 200px;
   -webkit-transition: -webkit-transform 2s linear;
@@ -22,8 +21,8 @@
 
 .face {
   position: absolute;
-  height: 150px;
-  width: 150px;
+  height: 200px;
+  width: 200px;
   padding: 20px;
   background-color: rgba(50, 50, 50, 0.7);
   font-size: 16px;
@@ -34,37 +33,37 @@
 }
 
 #cube .one  {
-  -webkit-transform: rotateX(90deg) translateZ(95px);
-  -moz-transform: rotateX(90deg) translateZ(95px);
-  transform: rotateX(90deg) translateZ(95px);
+  -webkit-transform: rotateX(90deg) translateZ(120px);
+  -moz-transform: rotateX(90deg) translateZ(120px);
+  transform: rotateX(90deg) translateZ(120px);
 }
 
 #cube .two {
-  -webkit-transform: translateZ(95px);
-  -moz-transform: translateZ(95px);
-  transform: translateZ(95px);
+  -webkit-transform: translateZ(120px);
+  -moz-transform: translateZ(120px);
+  transform: translateZ(120px);
 }
 
 #cube .three {
-  -webkit-transform: rotateY(90deg) translateZ(95px);
-  -moz-transform: rotateY(90deg) translateZ(95px);
-  transform: rotateY(90deg) translateZ(95px);
+  -webkit-transform: rotateY(90deg) translateZ(120px);
+  -moz-transform: rotateY(90deg) translateZ(120px);
+  transform: rotateY(90deg) translateZ(120px);
 }
 
 #cube .four {
-  -webkit-transform: rotateY(180deg) translateZ(95px);
-  -moz-transform: rotateY(180deg) translateZ(95px);
-  transform: rotateY(180deg) translateZ(95px);
+  -webkit-transform: rotateY(180deg) translateZ(120px);
+  -moz-transform: rotateY(180deg) translateZ(120px);
+  transform: rotateY(180deg) translateZ(120px);
 }
 
 #cube .five {
-  -webkit-transform: rotateY(-90deg) translateZ(95px);
-  -moz-transform: rotateY(-90deg) translateZ(95px);
-  transform: rotateY(-90deg) translateZ(95px);
+  -webkit-transform: rotateY(-90deg) translateZ(120px);
+  -moz-transform: rotateY(-90deg) translateZ(120px);
+  transform: rotateY(-90deg) translateZ(120px);
 }
 
 #cube .six {
-  -webkit-transform: rotateX(-90deg) rotate(180deg) translateZ(95px);
-  -moz-transform: rotateX(-90deg) rotate(180deg) translateZ(95px);
-  transform: rotateX(-90deg) rotate(180deg) translateZ(95px);
+  -webkit-transform: rotateX(-90deg) rotate(180deg) translateZ(120px);
+  -moz-transform: rotateX(-90deg) rotate(180deg) translateZ(120px);
+  transform: rotateX(-90deg) rotate(180deg) translateZ(120px);
 }
