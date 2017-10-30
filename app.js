@@ -49,7 +49,7 @@ if (cfenv.getAppEnv().isLocal) {
   app.get('/login',function(req,res) {
     
     req.session.name = "User";
-    req.session.email = "user@mail.com";
+    req.session.email = "lecturer@mail.com";
     req.session.picture = "https://cdn1.iconfinder.com/data/icons/mix-color-4/502/Untitled-1-512.png";
     req.session.permission = "lecturer";
 
@@ -124,55 +124,55 @@ else {
       secure: true
     }
   }));
-  
+
   app.use(passport.initialize());
   app.use(passport.session());
-  
+
   passport.use(new bluemix_appid.WebAppStrategy());
-  
+
   bluemix_appid.UserAttributeManager.init();
-  
+
   passport.serializeUser(function(user, cb) {
     cb(null, user);
   });
-  
+
   passport.deserializeUser(function(obj, cb) {
     cb(null, obj);
   });
-  
+
   app.get(LOGIN_URL, passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME, {
     forceLogin: true
   }));
-  
+
   app.get(CALLBACK_URL, passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME, {allowAnonymousLogin: true}));
-  
+
   app.get("/protected", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME), function(req, res) {
     var accessToken = req.session[bluemix_appid.WebAppStrategy.AUTH_CONTEXT].accessToken;
-  
+
     bluemix_appid.UserAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
 
       req.session.name = req.user.name;
       req.session.email = req.user.email;
       req.session.picture = req.user.picture;
       req.session.permission = "lecturer";
-  
+
       /// 0 - not registered yet, 1 - student, 2 - lecturer
       var class_id_array = new Array();
       var class_start_array = new Array();
       var class_duration_array = new Array();
       var class_title_array = new Array();
       var enrolled_class_array = new Array();
-  
+
       student_timetable_db.find({selector:{studentId:req.session.email}}, function(er1, result1) {
         if (er1) {
           throw er1;
         }
-  
+
         lecturer_timetable_db.find({selector:{lecturerId:req.session.email}}, function(er2, result2) {
           if (er2) {
             throw er2;
           }
-  
+
           lecturer_timetable_db.find({selector:{}}, function(er3, result3) {
             if (er3) {
               throw er3;
@@ -193,11 +193,11 @@ else {
                 enrolled_class_array.push(enrolled ? "checked" : "");
               }
             }
-  
+
             if(result1.docs.length != 0) {
               req.session.permission = "student";
             }
-  
+
             res.render('landing', {
               name: req.session.name, 
               email: req.session.email,
@@ -215,7 +215,7 @@ else {
       });
     });
   });
-  
+
   app.get("/login", passport.authenticate(bluemix_appid.WebAppStrategy.STRATEGY_NAME, {successRedirect : '/protected', forceLogin: true}));
 }
 
@@ -254,7 +254,7 @@ app.get('/login_student',function(req, res) {
         }
         if (req.query.removed_classes) {
           var obj_array = new Array();
-
+          res.send(JSON.parse("{\"success\":\"true\"}"));
           for(var i = 0; i < req.query.removed_classes.length; i++) {
             var classid = req.query.removed_classes[i];
             student_timetable_db.find({selector:{studentId:req.session.email, classId:classid}}, function(er, result) {
@@ -263,7 +263,6 @@ app.get('/login_student',function(req, res) {
               }
               if (result && result.docs && result.docs.length) {
                 student_timetable_db.destroy(result.docs[0]._id, result.docs[0]._rev, function(err) {
-                  res.send(JSON.parse("{\"success\":\"true\"}"));
                 });
               }
             });
@@ -275,6 +274,8 @@ app.get('/login_student',function(req, res) {
     } else if (req.query.removed_classes) {
       var obj_array = new Array();
 
+      res.send(JSON.parse("{\"success\":\"true\"}"));
+
       for(var i = 0; i < req.query.removed_classes.length; i++) {
         var classid = req.query.removed_classes[i];
         student_timetable_db.find({selector:{studentId:req.session.email, classId:classid}}, function(er, result) {
@@ -283,7 +284,6 @@ app.get('/login_student',function(req, res) {
               if(err) {
                 console.log(err);
               }
-              res.send(JSON.parse("{\"success\":\"true\"}"));
             });
           }
         });
@@ -299,7 +299,7 @@ app.get('/fill_schedule_table', function(req, res) {
       if (er) {
         throw er;
       }
-      
+
       var obj_array = new Array();
       var ids = new Array();
       for (var i = 0; i < result1.docs.length; i++) {
@@ -404,7 +404,10 @@ app.get('/update_class',function(req, res) {
         "\"duration\":\"" + req.query.upd_duration + "\", " + 
         "\"title\":\"" + req.query.upd_class_title + "\", " + 
         "\"description\":\"" + req.query.upd_class_description + "\"," + 
-        "\"lecturerId\":\"" + req.session.email + "\"" + 
+        "\"lecturerId\":\"" + req.session.email + "\"," + 
+        "\"lat\":\"" + req.query.upd_lat + "\"," + 
+        "\"lng\":\"" + req.query.upd_lng + "\"," + 
+        "\"venue\":\"" + req.query.upd_venue + "\"" + 
         "}";
 
       var update_obj = JSON.parse(string_to_update);
