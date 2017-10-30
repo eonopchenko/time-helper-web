@@ -57,6 +57,7 @@ $(document).ready(function() {
 					"getElementById('upd_start').value = '" + moment(start).format('dddd hh:mm A') + "';" + 
 					// "document.getElementById('upd_start').value = '" + data[i].start + "';" + 
 					"document.getElementById('upd_duration').value = '" + data[i].duration + "';" + 
+					"document.getElementById('upd_venue').value = '" + data[i].venue + "';" + 
 					"document.getElementById('upd_class_title').value = '" + data[i].title + "';" + 
 					"document.getElementById('upd_class_description').value = '" + data[i].description + "';" + 
 				"\"" + 
@@ -259,6 +260,16 @@ $(document).ready(function() {
 
 	$("#create_class_button").click(function(e) {
 		e.preventDefault();
+		var e = document.getElementById("create_venue");
+		var latitude = 0.0;
+		var longitude = 0.0;
+		if(e.selectedIndex == 0) {
+			latitude = -36.8801704;
+			longitude = 174.7067334;
+		} else {
+			latitude = -36.8805559;
+			longitude = 174.7063474;
+		}
 		$.ajax({
 			url: "/create_class",
 			type: "GET",
@@ -267,7 +278,10 @@ $(document).ready(function() {
 				start: $("#create_start").val(),
 				duration: $("#create_duration").val(),
 				title: $("#create_class_title").val(),
-				description: $("#create_class_description").val()
+				description: $("#create_class_description").val(),
+				venue: $("#create_venue").val(),
+				lat: latitude,
+				lng: longitude
 			},
 			contentType: "application/json",
 			cache: true,
@@ -292,6 +306,16 @@ $(document).ready(function() {
 
 	 $("#update_class_button").click(function(e){
 	 	e.preventDefault();
+		var e = document.getElementById("upd_venue");
+		var latitude = 0.0;
+		var longitude = 0.0;
+		if(e.selectedIndex == 0) {
+		 latitude = -36.8801704;
+		 longitude = 174.7067334;
+		} else {
+		 latitude = -36.8805559;
+		 longitude = 174.7063474;
+		}
 	 	$.ajax({
 	 		url: "/update_class",
 	 		type: "GET",
@@ -300,7 +324,11 @@ $(document).ready(function() {
 				 upd_start: $("#upd_start").val(), 
 				 upd_duration: $("#upd_duration").val(), 
 				 upd_class_title: $("#upd_class_title").val(), 
-				 upd_class_description: $("#upd_class_description").val()},
+				 upd_class_description: $("#upd_class_description").val(),
+				 upd_venue: $("#upd_venue").val(),
+				 upd_lat: latitude,
+				 upd_lng: longitude
+				},
 	 		contentType: "application/json",
 	 		cache: true,
 	 		timeout: 5000,
