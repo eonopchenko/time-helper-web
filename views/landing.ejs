@@ -14,14 +14,14 @@
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top navigation_bar" style="background-color:#152935;">
-        <div class="content" align="center" style="background-color:#25313D;">
+        <div class="content" align="center" style="background-color:#25313D;" id="content-header">
             <div class="row">
                 <h3 style="color: #FFFFFA;">Hi, <%= name %> (<%= email %>)!</h3>
             </div>
             <div class="row">
                 <h4 id="welcome" style="color: #FFFFFA;">Welcome to the <%= permission %> section of Timehelper!</h4>
             </div>
-            <div clas="row">
+            <div clas="row" id="user-div">
                 <div class = "user-profile">
                     <button style="background-color:#25313D;" class="btn-link dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img style="color: #FFFFFA; width: 60px; height: 60px;" class="user-profile" src="<%= picture %>" alt="picture" />
@@ -378,11 +378,8 @@
                     </table>
                 </div>
                 <div class="space"></div> 
-                    <div class="footer "  >
-                    <div class="today"><strong>Tasks: Today</strong><br>Buy text books<br>Email Lecturer<br> Draft CV</div>
-                    <div class="time"><strong>Time</strong><br>8pm-10am<br>2pm<br>9pm-10pm</div>
-                    <div class="category"><strong>Category</strong><br>Study<br>Study<br>Work</div>
-                    <div class="reminder"><strong>Reminder</strong><br>None<br>1:30pm<br>None</div>
+                    <div class="footer">
+                    <div class="copy"><h3>Copyright © 2017 Cloud Solutions Inc. All rights reserved.</h3></div>
                 </div>
                 <div class="after-space"></div>
             </div>

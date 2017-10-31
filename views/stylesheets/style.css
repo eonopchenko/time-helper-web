@@ -22,7 +22,6 @@
 	padding-left: 15px;
   padding-right: 15px;
   padding: 5px;
-	
 }
 .footer {
 	width: 100%;
@@ -33,16 +32,20 @@
 	border-left: 2px solid;
 	border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
-  padding-top: 7px;
+  padding-top: 0px;
   text-align: center;
   background: #25313D;
+  background-image: url("/img/bg-header.jpg"); 
+  background-attachment:fixed;
+  background-position:top;
+  background-size: 100%;
 }
 .footer div {
   display: inline-block;
   align-content: center;
-  float: center;
-  overflow: right;
-  padding-right: 140px;
+  padding-right: 0px;
+  padding-bottom: 10px;
+  padding-left: 16%
 }
 .today{
   color: white;
@@ -142,6 +145,7 @@
     float: center;
     overflow: right;
     padding-right: 40px;
+    
 }
 }
 /* Small devices (landscape phones, 576px and up)*/
