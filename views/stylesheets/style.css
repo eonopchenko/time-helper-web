@@ -179,9 +179,9 @@
 }
 
 #taskView div:hover{
-  height: auto!important;
+  /* height: auto!important; */
   cursor: pointer;
-  z-index: 10001;
+  /* z-index: 10001; */
 }
 
 #taskView div {
