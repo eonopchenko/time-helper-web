@@ -194,11 +194,11 @@
   height: 40px;
 }
 
-#taskView div:hover{
+/* #taskView div:hover{
   height: auto!important;
   cursor: pointer;
   z-index: 10001;
-}
+} */
 
 #taskView div {
   transition: height 0.5s;
