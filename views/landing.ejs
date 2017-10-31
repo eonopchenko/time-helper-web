@@ -35,11 +35,7 @@
         </div>
     </div>
     <div class="container form_details">
-        <div id="reenroll_button_div" style="display:none">
-            <button id="reenroll_button" type="button" class="btn btn-primary btn-md">
-                Re-enroll
-            </button>
-        </div>
+        
         <div id="created_class" style="display:none">
             <div class="alert alert-success">
                 Successfully created (please, refresh the page)
@@ -62,7 +58,7 @@
                     <div class="form-group">
                         <div class="row">
                             <div class='col-sm-3'>
-                                <div class="form-group">
+                                <div class="form-group picker-g">
                                     <div class='input-group date' id='create_datetimepicker'>
                                         <input type='text' class="form-control" id='create_start' name='create_start'/>
                                         <span class="input-group-addon">
@@ -100,12 +96,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <div class="col-md-4">
+                        <div class="col-md-4 class-t">
                             <input type="text" autocomplete="off" class="form-control" id="create_class_title" name="create_class_title" placeholder="Enter class title"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-md-4">
+                        <div class="col-md-4 class-t">
                             <input type="text" autocomplete="off" class="form-control" id="create_class_description" name="create_class_description" placeholder="Enter class description"/>
                         </div>
                     </div>
@@ -125,7 +121,7 @@
                     <div class="form-group">
                         <div class="row">
                             <div class='col-md-3'>
-                                <div class="form-group">
+                                <div class="form-group picker-g">
                                     <div class='input-group date' id='upd_datetimepicker'>
                                         <input type='text' class="form-control" id='upd_start' name='upd_start' readonly/>
                                         <span class="input-group-addon">
@@ -163,12 +159,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <div class="col-md-4">
+                        <div class="col-md-4 class-t">
                             <input type="text" autocomplete="off" class="form-control" id="upd_class_title" name="upd_class_title" placeholder="Enter class title"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-md-4">
+                        <div class="col-md-4 class-t">
                             <input type="text" autocomplete="off" class="form-control" id="upd_class_description" name="upd_class_description" placeholder="Enter class description"/>
                         </div>
                     </div>
@@ -186,6 +182,10 @@
             <div class="naviBar">
                 <ul class="navi nav nav-tabs">
                     <li class="active"><a data-toggle="tab" href="#taskViewDiv">My schedule</a></li>
+                    <li class="active"> <div id="reenroll_button_div" style="display:none">
+                        
+                        
+                    <a  id="reenroll_button" data-toggle="tab" href="#taskViewDiv">Enroll</a></div></li>
                 </ul>
             </div>
             <div class="tab-content">
