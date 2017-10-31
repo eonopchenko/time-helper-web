@@ -1,0 +1,32 @@
+.user-profile {
+  border-radius: 50%;
+  width:60px;
+  height:60px;
+  position: relative;
+}
+
+.operations_options {
+margin-top: 10px;
+margin-bottom: 10px;
+}
+
+.form_details {
+padding-top: 12%;
+}
+#create_datetimepicker{
+width: 200px;
+}
+body {
+background-image: url("/img/bg.jpg");
+background-repeat: no-repeat;
+background-attachment: fixed;
+}
+
+.copy h3{
+color: white;
+padding-left: 15%;
+width: 100%
+}
+#user-div{
+padding-bottom: 15px;
+}
