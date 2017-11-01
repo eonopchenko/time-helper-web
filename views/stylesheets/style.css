@@ -14,9 +14,6 @@
 #buttons{
   padding-left: 10%
 }
-.current{
-	background-color: #fff;
-}
 .content{
 	padding-top: 25px;
 	padding-left: 15px;
@@ -127,42 +124,30 @@
 /* Extra small devices (portrait phones, less than 576px) */
 @media (max-width: 575px) {
   .footer div {
-    display: inline-block;
     align-content: center;
     float: center;
-    overflow: right;
-    padding-right: 40px;
 }
 }
 /* Small devices (landscape phones, 576px and up)*/
 @media (min-width: 576px) and (max-width: 767px) {
   .footer div {
-    display: inline-block;
     align-content: center;
     float: center;
-    overflow: right;
-    padding-right: 60px;
   }
  }
 
 /* Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) and (max-width: 991px) { 
   .footer div {
-    display: inline-block;
     align-content: center;
     float: center;
-    overflow: right;
-    padding-right: 80px;
  }
 }
 /* Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) and (max-width: 1199px) { 
   .footer div {
-    display: inline-block;
     align-content: center;
     float: center;
-    overflow: right;
-    padding-right: 100px;
  }
  .col-md-offset-2{
    margin-left: 0%
@@ -171,11 +156,8 @@
 /* Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) { 
   .footer div {
-    display: inline-block;
     align-content: center;
     float: center;
-    overflow: right;
-    padding-right: 140px;
  }
 }
 
