@@ -35,6 +35,9 @@ h3 {
     line-height: 20px;
     display: inline;
 }
+h4{
+    color: white;
+  }
 
 .main-container {
     flex: 1 1 100%;

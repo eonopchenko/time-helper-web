@@ -15,7 +15,7 @@
   padding-left: 10%
 }
 .current{
-	background-color: lightgray;
+	background-color: #fff;
 }
 .content{
 	padding-top: 25px;
@@ -70,7 +70,7 @@
   color: #444;
   text-shadow: 0 1px 0 rgba(255,255,255,.8);
   border-radius: 5px 0 0 0;
-  box-shadow: 0 2px 2px rgba(0,0,0,.4);
+  /*box-shadow: 0 2px 2px rgba(0,0,0,.4);*/
 }
 
 .navi a:hover,
@@ -79,9 +79,15 @@
 .navi a:focus::after {
   background: #fff;
 }
-
+.navi li a:focus {
+  background-color: #fff;
+}
+.navi li a:hover {
+  background-color: #fff;
+}
 .navi a:focus {
   outline: 0;
+  background: #fff;
 }
 
 .navi a::after {
