@@ -23,7 +23,7 @@ app.use(express.static("views"));
 
 ///--- CLOUDANT SETTINGS ---///
 var cloudant_url = 'https://dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix:397e251ab62bc131be9b552263a174e7d6701f4c261f8f0ed55853e4867e6b00@dd99ab4a-3be7-4c60-9eea-90e610e7ff3b-bluemix.cloudant.com';
-var cloudant_instance = сloudant({url: cloudant_url});
+var cloudant_instance = сloudant({url: cloudant_url, plugin: 'promises'});
 lecturer_timetable_db = cloudant_instance.db.use('lecturer_timetable_db');
 student_timetable_db = cloudant_instance.db.use('student_timetable_db');
 
@@ -59,19 +59,13 @@ if (cfenv.getAppEnv().isLocal) {
     var class_duration_array = new Array();
     var class_title_array = new Array();
     var enrolled_class_array = new Array();
+
+    /// Set user permissions, depending on database content (at least 1 record in lecturer_timetable_db - lecturer,
+    /// at least 1 record in student_timetable_db - student)
     student_timetable_db.find({selector:{studentId:req.session.email}}, function(er1, result1) {
-      if (er1) {
-        throw er1;
-      }
       lecturer_timetable_db.find({selector:{lecturerId:req.session.email}}, function(er2, result2) {
-        if (er2) {
-          throw er2;
-        }
         lecturer_timetable_db.find({selector:{}}, function(er3, result3) {
-          if (er3) {
-            throw er3;
-          }
-          if(result3.docs.length != 0) {
+          if (result3.docs.length != 0) {
             for (var i = 0; i < result3.docs.length; i++) {
               class_id_array.push(result3.docs[i]._id);
               class_start_array.push(result3.docs[i].start);
@@ -79,7 +73,7 @@ if (cfenv.getAppEnv().isLocal) {
               class_title_array.push(result3.docs[i].title);
               var enrolled = false;
               for (var j = 0; j < result1.docs.length; j++) {
-                if(result3.docs[i]._id == result1.docs[j].classId) {
+                if (result3.docs[i]._id == result1.docs[j].classId) {
                   enrolled = true;
                   break;
                 }
@@ -88,7 +82,7 @@ if (cfenv.getAppEnv().isLocal) {
             }
           }
 
-          if(result1.docs.length != 0) {
+          if (result1.docs.length != 0) {
             req.session.permission = "student";
           }
 
@@ -163,21 +157,11 @@ else {
       var class_title_array = new Array();
       var enrolled_class_array = new Array();
 
+      /// Retrieve data from database
       student_timetable_db.find({selector:{studentId:req.session.email}}, function(er1, result1) {
-        if (er1) {
-          throw er1;
-        }
-
         lecturer_timetable_db.find({selector:{lecturerId:req.session.email}}, function(er2, result2) {
-          if (er2) {
-            throw er2;
-          }
-
           lecturer_timetable_db.find({selector:{}}, function(er3, result3) {
-            if (er3) {
-              throw er3;
-            }
-            if(result3.docs.length != 0) {
+            if (result3.docs.length != 0) {
               for (var i = 0; i < result3.docs.length; i++) {
                 class_id_array.push(result3.docs[i]._id);
                 class_start_array.push(result3.docs[i].start);
@@ -185,7 +169,7 @@ else {
                 class_title_array.push(result3.docs[i].title);
                 var enrolled = false;
                 for (var j = 0; j < result1.docs.length; j++) {
-                  if(result3.docs[i]._id == result1.docs[j].classId) {
+                  if (result3.docs[i]._id == result1.docs[j].classId) {
                     enrolled = true;
                     break;
                   }
@@ -194,10 +178,11 @@ else {
               }
             }
 
-            if(result1.docs.length != 0) {
+            if (result1.docs.length != 0) {
               req.session.permission = "student";
             }
 
+            /// Render landing page, depending on retrieved data
             res.render('landing', {
               name: req.session.name, 
               email: req.session.email,
@@ -223,6 +208,7 @@ app.get('/',function(req,res) {
   res.sendfile(__dirname + '/views/index.html');
 });
 
+/// Login as a lecturer
 app.get('/login_lecturer',function(req, res) {
   var url = cloudant_url + "/lecturer_timetable_db/_design/lecturer_timetable_db/_view/lecturer_timetable_db";
   request({
@@ -234,72 +220,61 @@ app.get('/login_lecturer',function(req, res) {
   });
 });
 
+/// Login as a student (check, whether classes must be added or removed and update enrolled classes list)
 app.get('/login_student',function(req, res) {
+  var classesToRemove = req.query.removed_classes && req.query.removed_classes.length;
+  var classesToAdd = req.query.added_classes && req.query.added_classes.length;
 
-  res.contentType('application/json');
+  if (classesToRemove || classesToAdd) {
+    if (classesToRemove) {
+      array = [];
+      var classesLeft = req.query.removed_classes.length;
+      req.query.removed_classes.forEach(function(data) {
+        student_timetable_db.find({selector:{studentId:req.session.email, classId:data}}, function(er, result) {
+          student_timetable_db.destroy(result.docs[0]._id, result.docs[0]._rev, function(err) {
+            if (--classesLeft === 0) {
+              if (classesToAdd) {
+                var array = new Array();
+                for (var i = 0; i < req.query.added_classes.length; i++) {
+                  array.push({"studentId": req.session.email, "classId": req.query.added_classes[i]});
+                }
 
-  if (req.query.added_classes || req.query.removed_classes) {
-
-    if (req.query.added_classes) {
-      var obj_array = new Array();
-
-      for(var i = 0; i < req.query.added_classes.length; i++) {
-        var classid = req.query.added_classes[i];
-        obj_array.push({"studentId": req.session.email, "classId": classid});
-      }
-
-      student_timetable_db.bulk({docs:obj_array}, function(err, data) {
-        if(err) {
-          console.log(err);
-        }
-        if (req.query.removed_classes) {
-          var obj_array = new Array();
-          res.send(JSON.parse("{\"success\":\"true\"}"));
-          for(var i = 0; i < req.query.removed_classes.length; i++) {
-            var classid = req.query.removed_classes[i];
-            student_timetable_db.find({selector:{studentId:req.session.email, classId:classid}}, function(er, result) {
-              if(er) {
-                console.log(er);
-              }
-              if (result && result.docs && result.docs.length) {
-                student_timetable_db.destroy(result.docs[0]._id, result.docs[0]._rev, function(err) {
+                student_timetable_db.bulk({docs:array}, function(err, data) {
+                  res.contentType('application/json');
+                  res.send(JSON.parse("{\"success\":\"true\"}"));
                 });
+              } else {
+                res.contentType('application/json');
+                res.send(JSON.parse("{\"success\":\"true\"}"));
               }
-            });
-          }
-        } else {
-          res.send(JSON.parse("{\"success\":\"true\"}"));
-        }
+            }
+          });
+        });
       });
-    } else if (req.query.removed_classes) {
-      var obj_array = new Array();
+    }
 
-      res.send(JSON.parse("{\"success\":\"true\"}"));
+    if (!classesToRemove && classesToAdd) {
+        var array = new Array();
+        for (var i = 0; i < req.query.added_classes.length; i++) {
+          array.push({"studentId": req.session.email, "classId": req.query.added_classes[i]});
+        }
 
-      for(var i = 0; i < req.query.removed_classes.length; i++) {
-        var classid = req.query.removed_classes[i];
-        student_timetable_db.find({selector:{studentId:req.session.email, classId:classid}}, function(er, result) {
-          if (result && result.docs && result.docs.length) {
-            student_timetable_db.destroy(result.docs[0]._id, result.docs[0]._rev, function(err) {
-              if(err) {
-                console.log(err);
-              }
-            });
-          }
+        student_timetable_db.bulk({docs:array}, function(err, data) {
+          res.contentType('application/json');
+          res.send(JSON.parse("{\"success\":\"true\"}"));
+          return;
         });
       }
+    } else {
+      res.contentType('application/json');
+      res.send(JSON.parse("{\"success\":\"true\"}"));
     }
-  }
 });
 
+/// Initial setting of dropdown lists
 app.get('/fill_schedule_table', function(req, res) {
-  /// @todo refactor (rough hack to sort async tasks out)
   if (req.session.permission == "student") {
     student_timetable_db.find({selector:{studentId:req.session.email}}, function(er, result1) {
-      if (er) {
-        throw er;
-      }
-
       var obj_array = new Array();
       var ids = new Array();
       for (var i = 0; i < result1.docs.length; i++) {
@@ -307,10 +282,10 @@ app.get('/fill_schedule_table', function(req, res) {
       }
 
       lecturer_timetable_db.find({selector:{}}, function(er, result2) {
-        if(result2) {
+        if (result2) {
           for (var i = 0; i < result2.docs.length; i++) {
             for (var j = 0; j < ids.length; j++) {
-              if(ids[j] == result2.docs[i]._id) {
+              if (ids[j] == result2.docs[i]._id) {
                 obj_array.push(result2.docs[i]);
               }
             }
@@ -321,10 +296,6 @@ app.get('/fill_schedule_table', function(req, res) {
     });
   } else if (req.session.permission == "lecturer") {
     lecturer_timetable_db.find({selector:{lecturerId:req.session.email}}, function(er, result) {
-      if (er) {
-        throw er;
-      }
-      
       var obj_array = new Array();
       var ids = new Array();
       for (var i = 0; i < result.docs.length; i++) {
@@ -335,6 +306,7 @@ app.get('/fill_schedule_table', function(req, res) {
   }
 });
 
+/// Lecturer - new class creation
 app.get('/create_class',function(req, res) {
   var url = cloudant_url + "/lecturer_timetable_db/_design/lecturer_timetable_db/_view/lecturer_timetable_db";
   var title_string;
@@ -343,12 +315,12 @@ app.get('/create_class',function(req, res) {
     json: true
   }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      // console.log("Received: " + JSON.stringify(req.query));
       req.query.lecturerId = req.session.email;
       lecturer_timetable_db.insert(req.query, function(err, data) {
         if (!err) {
           title_string="{\"added\":\"Yes\"}";
 
+          /// Notify all studetns, registered in the database
           var message = PushMessageBuilder.Message.alert("New class has been scheduled: " + 
             req.query.start + ", " + 
             req.query.duration + ", " + 
@@ -356,19 +328,14 @@ app.get('/create_class',function(req, res) {
           ).build();
           var notificationExample =  Notification.message(message).build();
           myPushNotifications.send(notificationExample, function(error, response, body) {
-            // console.log("Error: " + error);
-            // console.log("Response: " + JSON.stringify(response));
-            // console.log("Body: " + body);
           });
-        }
-        else {
+        } else {
           title_string="{\"added\":\"DB insert error\"}";
         }
         res.contentType('application/json');
         res.send(JSON.parse(title_string));
       });
-    }
-    else {
+    } else {
       title_string="{\"added\":\"DB read error\"}";
       res.contentType('application/json');
       res.send(JSON.parse(title_string));
@@ -376,6 +343,7 @@ app.get('/create_class',function(req, res) {
   });
 });
 
+/// Lecturer - class update
 app.get('/update_class',function(req, res) {
   var url = cloudant_url + "/lecturer_timetable_db/_design/lecturer_timetable_db/_view/lecturer_timetable_db";
   request({
@@ -411,9 +379,9 @@ app.get('/update_class',function(req, res) {
         "}";
 
       var update_obj = JSON.parse(string_to_update);
-      if(total_rows !== 0) {
+      if (total_rows !== 0) {
         lecturer_timetable_db.insert(update_obj, function(err, data) {
-          if(!err) {
+          if (!err) {
             student_timetable_db.find({selector:{classId:id_to_update}}, function(er, result) {
               
               var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
@@ -421,11 +389,11 @@ app.get('/update_class',function(req, res) {
                 req.query.upd_duration + ", " + 
                 req.query.upd_class_title
               ).build();
-              
-              if(!er) {
+
+              if (!er) {
                 if (result && result.docs && (result.docs.length != 0)) {
                   var ids = new Array();
-                  for(var i = 0; i < result.docs.length; i++) {
+                  for (var i = 0; i < result.docs.length; i++) {
                     ids.push(result.docs[i].studentId);
                   }
                   var target = PushMessageBuilder.Target.userIds(ids).build();
@@ -439,20 +407,17 @@ app.get('/update_class',function(req, res) {
               }
             });
           } else {
-            // console.log("Couldn't update class " + err);
             class_string="{\"updated\":\"could not update\"}";
             res.contentType('application/json');
             res.send(JSON.parse(class_string));
           }
         });
       } else {
-        // console.log("DB is empty");
         var class_string="{\"updated\":\"empty database\"}";
         res.contentType('application/json');
         res.send(JSON.parse(class_string));
       }
     } else {
-      // console.log("No response from URL. Status : " + response.statusCode);
       class_string="{\"updated\":\"DB read error\"}";
       res.contentType('application/json');
       res.send(JSON.parse(class_string));
@@ -460,8 +425,8 @@ app.get('/update_class',function(req, res) {
   });
 });
 
+// Lecturer - class removal
 app.get('/remove_class',function(req, res) {
-  // console.log("Class to be removed : = " + req.query.start);
   var url = cloudant_url + "/lecturer_timetable_db/_design/lecturer_timetable_db/_view/lecturer_timetable_db";
   request({
        url: url, 
@@ -473,29 +438,29 @@ app.get('/remove_class',function(req, res) {
         var id_to_remove;
         var rev_to_remove;
         var total_rows = user_data.length;
-        for(var i=0; i< user_data.length; i++) {
+        for (var i=0; i< user_data.length; i++) {
           var doc = user_data[i];
-          if(doc.value[1] === req.query.start) {
+          if (doc.value[1] === req.query.start) {
             id_to_remove = doc.key;
             rev_to_remove = doc.value[0];
             break;
           }
         }
-        if(total_rows !== 0) {
+        if (total_rows !== 0) {
           lecturer_timetable_db.destroy(id_to_remove, rev_to_remove, function(err) {
-            if(!err) {
+            if (!err) {
               student_timetable_db.find({selector:{classId:id_to_remove}}, function(er, result) {
-                
+
                 var message = PushMessageBuilder.Message.alert("Class has been updated: " + 
                   req.query.start + ", " + 
                   req.query.duration + ", " + 
                   req.query.title
                 ).build();
-                
-                if(!er) {
+
+                if (!er) {
                   if (result && result.docs && (result.docs.length != 0)) {
                     var ids = new Array();
-                    for(var i = 0; i < result.docs.length; i++) {
+                    for (var i = 0; i < result.docs.length; i++) {
                       ids.push(result.docs[i].studentId);
                     }
                     var target = PushMessageBuilder.Target.userIds(ids).build();
@@ -509,26 +474,17 @@ app.get('/remove_class',function(req, res) {
                 }
               });
             } else {
-              // console.log("Couldn't remove class");
-              // console.log(err);
               class_string="{\"removed\":\"could not remove\"}";
               res.contentType('application/json');
               res.send(JSON.parse(class_string));
             }
           });
-        }
-        else
-        {
-          // console.log("DB is empty");
+        } else {
           class_string="{\"removed\":\"empty database\"}";
           res.contentType('application/json');
           res.send(JSON.parse(class_string));
         }
-      }
-      else
-      {
-        // console.log("No data from URL");
-        // console.log("Response is : " + response.statusCode);
+      } else {
         class_string="{\"removed\":\"DB read error\"}";
         res.contentType('application/json');
         res.send(JSON.parse(class_string));

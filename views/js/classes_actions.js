@@ -19,7 +19,7 @@ $(document).ready(function() {
 				document.getElementById("reenroll_button_div").style.display='block';
 			}
 
-			for(var i = 0; i < data.length; i++) {
+			for (var i = 0; i < data.length; i++) {
 				var start = moment(data[i].start, "dddd hh:mm A");
 				var duration = data[i].duration;
 				var sp = duration.split(":");
@@ -27,8 +27,6 @@ $(document).ready(function() {
 				var mins = parseInt(sp[1]);
 
 				var d = start.toDate().getDay();
-				// var m = start.toDate().getMonth() + 1;
-				// var y = start.toDate().getYear() + 1900;
 
 				var colIndex = (start.minutes() == 0 ? 1 : 0) + d;
 				var rowIndex = ((start.hours() - 9) * 2 + (start.minutes() == 0 ? 0 : 1)) + 2;
@@ -41,8 +39,8 @@ $(document).ready(function() {
 
 				/// Assign colors, depending on row numbers
 				var colorIndex = 0;
-				for(var s = 5; s >= 1; s--) {
-					if(((rowIndex - 2) % s) == 0) {
+				for (var s = 5; s >= 1; s--) {
+					if (((rowIndex - 2) % s) == 0) {
 						colorIndex = s - 1;
 						break;
 					}
@@ -55,7 +53,6 @@ $(document).ready(function() {
 					"document.getElementById('update_class_form').style.display='block';" + 
 					"document.getElementById('create_class_form').style.display='none';" + 
 					"getElementById('upd_start').value = '" + moment(start).format('dddd hh:mm A') + "';" + 
-					// "document.getElementById('upd_start').value = '" + data[i].start + "';" + 
 					"document.getElementById('upd_duration').value = '" + data[i].duration + "';" + 
 					"document.getElementById('upd_venue').value = '" + data[i].venue + "';" + 
 					"document.getElementById('upd_class_title').value = '" + data[i].title + "';" + 
@@ -84,7 +81,6 @@ $(document).ready(function() {
 					"success: function(data) {" + 
 						"console.log('process success');" + 
 						"document.getElementById('removed_class').style.display='block';" + 
-						/// Refresh page (add table update, using AJAX later)
 						"location.reload(true);" + 
 					"}," + 
 					"error: function() {" + 
@@ -100,35 +96,12 @@ $(document).ready(function() {
 				"</h4>" + 
 				"<p style='font-family:\"Comic Sans MS\"'>" + data[i].description + "</p>" + 
 				"</div>";
-
-				// // Calculate the new height
-				// var height = cells * 100;
-				// var cell = (document.getElementById("taskView").rows[rowIndex].cells[colIndex]);
-				// // Create a new div to go inside the cell
-				// var newDiv = document.createElement("div");
-				// newDiv.style.color = textColors[colorIndex];
-				// newDiv.style.background = backgroundColors[colorIndex];
-				// newDiv.style.marginLeft = "auto";
-				// newDiv.style.marginRight = "right";
-				// newDiv.style.display = "block";
-				// newDiv.style.height = height + "px";
-				// newDiv.innerHTML = 
-				// 	'<button type="button" class="btn" style="float: right; background-color:' + buttonColors[colorIndex] + ';">' + 
-				// 	"<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>" + 
-				// 	"</button>" + 
-				// 	'<img src="img/pin.png" width="42" height="42">' + 
-				// 	"<h4>" + 
-				// 	"<p><strong># " + data[i].title + "</strong></p>" + 
-				// 	"</h4>" + 
-				// 	"<p style='font-family:\"Comic Sans MS\"'>" + data[i].description + "</p>";
-				// // Add it to view
-				// cell.appendChild(newDiv);
 			}
 
-			for(var rowIndex = 2; rowIndex < 20; rowIndex++) {
+			for (var rowIndex = 2; rowIndex < 20; rowIndex++) {
 				var from = ((rowIndex % 2) == 0) ? 1 : 0;
 				var to = ((rowIndex % 2) == 0) ? 8 : 7;
-				for(var colIndex = from; colIndex < to; colIndex++) {
+				for (var colIndex = from; colIndex < to; colIndex++) {
 
 					var hours = Math.floor(((rowIndex - 2) / 2) + 9);
 					var mins = ((rowIndex - 2) % 2 == 0) ? 0 : 30;
@@ -136,7 +109,7 @@ $(document).ready(function() {
 					// var start = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], hours, mins);
 					// var days = ['Sunday','Monday','Tuesday','Wednesday','Thrusday','Friday','Saturday'];
 					var start = new Date(moment((document.getElementById("taskView").rows[0].cells[colIndex + ((rowIndex % 2 == 0) ? 0 : 1)]).innerHTML + " " + hours + ":" + mins, "dddd hh:mm"));
-					if((document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML == "&nbsp;") {
+					if ((document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML == "&nbsp;") {
 						(document.getElementById("taskView").rows[rowIndex].cells[colIndex]).innerHTML = 
 						"<div>" + (permission == "lecturer" ? (
 						"<button type=\"button\" onclick=\"" + 
@@ -163,57 +136,67 @@ $(document).ready(function() {
 		var removed_classes_array = new Array();
 		var t = document.getElementById("enrollView");
 		var checkboxes = t.getElementsByTagName("input");
-		for(var i = 0; i < checkboxes.length; i++) {
-			if(checkboxes[i].checked) {
+		for (var i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i].checked) {
 				var found = false;
-				for(var j = 0; j < checked_classes_array.length; j++) {
-					if(checkboxes[i].name == checked_classes_array[j]) {
+				for (var j = 0; j < checked_classes_array.length; j++) {
+					if (checkboxes[i].name == checked_classes_array[j]) {
 						found = true;
 						break;
 					}
 				}
-				if(!found) {
+				if (!found) {
 					added_classes_array.push(checkboxes[i].name);
 				}
 			}
 		}
-		for(var i = 0; i < checked_classes_array.length; i++) {
+		for (var i = 0; i < checked_classes_array.length; i++) {
 			var found = false;
-			for(var j = 0; j < checkboxes.length; j++) {
-				if(!checkboxes[j].checked && (checked_classes_array[i] == checkboxes[j].name)) {
+			for (var j = 0; j < checkboxes.length; j++) {
+				if (!checkboxes[j].checked && (checked_classes_array[i] == checkboxes[j].name)) {
 					console.log("checked_classes_array[i] = " + checked_classes_array[i]);
 					console.log("checkboxes[j].name = " + checkboxes[j].name);
 					found = true;
 					break;
 				}
 			}
-			if(found) {
+			if (found) {
 				removed_classes_array.push(checked_classes_array[i]);
 			}
 		}
-		
-		$.ajax({
-			url: "/login_student",
-			type: "GET",
-			dataType: "json",
-			data: {
-				added_classes: added_classes_array,
-				removed_classes: removed_classes_array,
-			},
-			contentType: "application/json",
-			cache: true,
-			timeout: 5000,
-			complete: function() {
-			  console.log('process complete');
-			  location.reload(true);
-			},
-			success: function(data) {
-				console.log('process success');
-			},
-			error: function() {
-				console.log('process error');
-			},
-		});
+
+		if (removed_classes_array.length < 4) {
+			$.ajax({
+				url: "/login_student",
+				type: "GET",
+				dataType: "json",
+				data: {
+					added_classes: added_classes_array,
+					removed_classes: removed_classes_array,
+				},
+				contentType: "application/json",
+				cache: true,
+				timeout: 5000,
+				complete: function() {
+				console.log('process complete');
+				if (removed_classes_array.length != 0) {
+					setTimeout(function() {
+						location.reload(true);
+					}, 500);
+				} else {
+					location.reload(true);
+				}
+				},
+				success: function(data) {
+					console.log('process success');
+				},
+				error: function() {
+					console.log('process error');
+				},
+			});
+		} else {
+			alert("Please, select less than 4 classes to remove");
+		}
 	});
 
 	$("#button_login_lecturer").click(function(e) {
@@ -232,7 +215,7 @@ $(document).ready(function() {
 			},
 			success: function(data) {
 				console.log('process success');
-				if(data.success === "true") {
+				if (data.success === "true") {
 				  console.log('real success');
 				}
 				$("#myModal").modal("hide");
@@ -251,8 +234,8 @@ $(document).ready(function() {
 		var t = document.getElementById("enrollView");
 		var checkboxes = t.getElementsByTagName("input");
 		checked_classes_array = [];
-		for(var i = 0; i < checkboxes.length; i++) {
-			if(checkboxes[i].checked) {
+		for (var i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i].checked) {
 				checked_classes_array.push(checkboxes[i].name);
 			}
 		}
@@ -263,7 +246,7 @@ $(document).ready(function() {
 		var e = document.getElementById("create_venue");
 		var latitude = 0.0;
 		var longitude = 0.0;
-		if(e.selectedIndex == 0) {
+		if (e.selectedIndex == 0) {
 			latitude = -36.8801704;
 			longitude = 174.7067334;
 		} else {
@@ -291,7 +274,7 @@ $(document).ready(function() {
 			},
 			success: function(data) {
 				console.log('process success');
-				if(data.added === "Yes") {
+				if (data.added === "Yes") {
 					document.getElementById("create_class_form").style.display="none";
 	 				document.getElementById("created_class").style.display="block";
 				}
@@ -309,7 +292,7 @@ $(document).ready(function() {
 		var e = document.getElementById("upd_venue");
 		var latitude = 0.0;
 		var longitude = 0.0;
-		if(e.selectedIndex == 0) {
+		if (e.selectedIndex == 0) {
 		 latitude = -36.8801704;
 		 longitude = 174.7067334;
 		} else {
@@ -337,7 +320,7 @@ $(document).ready(function() {
 	 		},
 	 		success: function(data) {
 				console.log('process success');
-	 			if(data.updated === "updated") {
+	 			if (data.updated === "updated") {
 					document.getElementById("update_class_form").style.display="none";
 	 				document.getElementById("updated_class").style.display="block";
 				 }
