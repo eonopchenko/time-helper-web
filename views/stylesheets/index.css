@@ -176,19 +176,14 @@ body {
     
   }
   .footer {
-	width: 100%;
   padding-top: 7px;
   text-align: center;
   background: #454545;
   margin: 0px;
 }
 .footer div {
-  display: inline-block;
   align-content: center;
   float: center;
-  overflow: right;
-  padding-right: 140px;
-  vertical-align: middle
 }
 .copy h4{
   color: white;
