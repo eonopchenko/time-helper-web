@@ -99,15 +99,17 @@
                         <div class="col-md-4 class-t">
                             <input type="text" autocomplete="off" class="form-control" id="create_class_title" name="create_class_title" placeholder="Enter class title"/>
                         </div>
+                        <div id="errorName"></div>
                     </div>
                     <div class="form-group">
                         <div class="col-md-4 class-t">
                             <input type="text" autocomplete="off" class="form-control" id="create_class_description" name="create_class_description" placeholder="Enter class description"/>
                         </div>
+                        <div id="errorSurmame"></div>
                     </div>
                     <div class="form-group">
                         <div class="col-lg-10 col-lg-offset-2">
-                            <button id="create_class_button" type="submit" class="btn btn-success">Create class</button>
+                            <button id="create_class_button" type="submit" class="btn btn-success" onclick="dataValidation()">Create class</button>
                         </div>
                     </div>
                 </fieldset>
@@ -415,6 +417,36 @@
               if(<%= showmodal %>)
                 $("#myModal").modal("show");
           })
+      </script>
+      <script type="text/javascript">
+          function dataValidation() 
+{
+	// initiate variables and get values from text fields on the web page
+	"use strict";
+	var name = document.getElementById('create_class_title');
+	var surname = document.getElementById('create_class_title_duration');
+	// initiate error messages
+	var errorName = "";
+	var errorSurname = "";
+	// validate fileds, if value less than 3 letters, print error message
+	if ( name.value.length < 3 )
+	{
+		errorName = "Incorrect Name, it must be at list 3 letters";
+	}
+	// validate fileds, if value less than 5 letters, print error message
+	if ( surname.value.length < 5 )
+	{
+		errorSurname += "Incorrect Surname, it must be at list 5 letters";
+	}
+    // get p tags and set error messages to it
+	document.getElementById('errorName').innerHTML = errorName;
+	document.getElementById('errorSurmame').innerHTML = errorSurname;
+	// validate if error messages have value null, show allert message 
+	if ( errorName === "" && errorSurname === "")
+	{
+		alert("Thank you, you were subscribed");
+	}
+}
       </script>
 </body>
 </html>
